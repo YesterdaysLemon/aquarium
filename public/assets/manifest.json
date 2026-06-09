@@ -1,0 +1,33 @@
+{
+  "fish": [
+    {
+      "name": "Clownfish",
+      "path": "/assets/fish/Clownfish.glb"
+    },
+    {
+      "name": "BlueTang",
+      "path": "/assets/fish/BlueTang.glb"
+    },
+    {
+      "name": "YellowTang",
+      "path": "/assets/fish/YellowTang.glb"
+    },
+    {
+      "name": "Goldfish",
+      "path": "/assets/fish/Goldfish.glb"
+    },
+    {
+      "name": "Koi",
+      "path": "/assets/fish/Koi.glb"
+    },
+    {
+      "name": "Puffer",
+      "path": "/assets/fish/Puffer.glb"
+    },
+    {
+      "name": "Shark",
+      "path": "/assets/fish/Shark.glb"
+    }
+  ],
+  "environment": "/assets/environment/underwater-environment.glb"
+}

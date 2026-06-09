@@ -1,0 +1,16 @@
+node_modules/
+dist/
+tmp/
+.vite/
+.cache/
+
+# Raw source model archives stay local; optimized web assets in public/assets are tracked.
+models/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.DS_Store
+Thumbs.db

@@ -1,0 +1,31 @@
+{
+  "name": "threejs-aquarium",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "prepare-assets": "node scripts/prepare-assets.mjs"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@gltf-transform/cli": "^4.4.0",
+    "adm-zip": "^0.5.16",
+    "fbx2gltf": "^0.9.7-p1",
+    "obj2gltf": "^3.2.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}

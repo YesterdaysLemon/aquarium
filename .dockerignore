@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.vite
+tmp
+models
+npm-debug.log*
+Dockerfile
+README.md
