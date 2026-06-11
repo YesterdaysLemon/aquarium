@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Koi side profile">
+  <path fill="#f3f0dd" d="M18 40c20-24 75-30 109 0-34 30-89 24-109 0z"/>
+  <path fill="#f16525" d="M44 25c12-7 28-7 39 0-15 3-22 12-25 26-13-5-18-13-14-26zM84 47c9-7 26-8 38-2-8 8-22 12-39 10z"/>
+  <path fill="#24201a" d="M58 23c9-3 17-2 25 2-8 4-16 8-22 15z"/>
+  <path fill="#eee8d0" d="M125 40l28-18v36z"/>
+  <path fill="#e56b2f" d="M74 59l21 13-7-22zM75 21l21-13-8 22z"/>
+  <circle cx="34" cy="35" r="5" fill="#171717"/>
+  <circle cx="35.5" cy="33.5" r="1.4" fill="#fff"/>
+</svg>

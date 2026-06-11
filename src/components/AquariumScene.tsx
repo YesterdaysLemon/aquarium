@@ -7,6 +7,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { CameraMode, Quality } from '../App';
 import { environmentColliders } from '../collision';
+import type { SpeciesId } from '../fishSpecies';
 import { BottomFog, LightRays } from './AtmosphereEffects';
 import { FishSchool, type FollowTarget } from './FishSchool';
 import { WaterEffects } from './WaterEffects';
@@ -18,12 +19,20 @@ type Props = {
   cameraMode: CameraMode;
   cameraResetKey: number;
   followFishIndex: number;
+  selectedSpecies: SpeciesId;
 };
 
 const environmentPath = '/assets/environment/underwater-environment.glb';
-const bottomShelfPattern = /(floor_plates|floor_modul|sand)/i;
 
-export function AquariumScene({ quality, paused, showHitboxes, cameraMode, cameraResetKey, followFishIndex }: Props) {
+export function AquariumScene({
+  quality,
+  paused,
+  showHitboxes,
+  cameraMode,
+  cameraResetKey,
+  followFishIndex,
+  selectedSpecies,
+}: Props) {
   const followTarget = useRef<FollowTarget>({
     position: new THREE.Vector3(0, 1, 15),
     velocity: new THREE.Vector3(1, 0, 0),
@@ -64,14 +73,17 @@ export function AquariumScene({ quality, paused, showHitboxes, cameraMode, camer
         <LightRays />
         <BottomFog />
         <EnvironmentAnchor />
+        <ReefDebris quality={quality} />
         <FishSchool
           quality={quality}
           paused={paused}
           showHitboxes={showHitboxes}
           followTarget={followTarget}
           followFishIndex={followFishIndex}
+          selectedSpecies={selectedSpecies}
         />
         {showHitboxes ? <EnvironmentHitboxes /> : null}
+        <MarineSnow quality={quality} paused={paused} />
         <Bubbles quality={quality} paused={paused} />
         <WaterEffects paused={paused} />
       </Suspense>
@@ -192,12 +204,6 @@ function EnvironmentAnchor() {
     clone.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
     clone.traverse((object) => {
       if (object instanceof THREE.Mesh) {
-        const label = getMeshLabel(object);
-        if (bottomShelfPattern.test(label)) {
-          object.visible = false;
-          return;
-        }
-
         object.castShadow = true;
         object.receiveShadow = true;
         const materials = Array.isArray(object.material) ? object.material : [object.material];
@@ -218,18 +224,6 @@ function EnvironmentAnchor() {
       <primitive object={scene} />
     </group>
   );
-}
-
-function getMeshLabel(mesh: THREE.Mesh) {
-  const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-  const materialLabels = materials.flatMap((material) => {
-    const textured = material as THREE.Material & {
-      map?: THREE.Texture | null;
-      normalMap?: THREE.Texture | null;
-    };
-    return [material.name, textured.map?.name, textured.normalMap?.name];
-  });
-  return [mesh.name, mesh.geometry.name, ...materialLabels].filter(Boolean).join(' ');
 }
 
 function EnvironmentHitboxes() {
@@ -255,11 +249,85 @@ function EnvironmentHitboxes() {
 function OceanVolume() {
   return (
     <group>
-      <mesh position={[0, -7.45, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -10.85, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <circleGeometry args={[32, 128]} />
-        <meshBasicMaterial color="#031724" transparent opacity={0.72} depthWrite={false} />
+        <meshBasicMaterial color="#031724" transparent opacity={0.32} depthWrite={false} />
       </mesh>
     </group>
+  );
+}
+
+function ReefDebris({ quality }: { quality: Quality }) {
+  const count = quality === 'high' ? 26 : 12;
+  const rocks = useMemo(
+    () =>
+      Array.from({ length: count }, (_, index) => {
+        const angle = index * 2.17;
+        const radius = 7 + ((index * 37) % 100) / 100 * 18;
+        const isFloating = index % 5 === 0;
+        return {
+          id: index,
+          position: [
+            Math.cos(angle) * radius,
+            isFloating ? -3.8 + (index % 4) * 1.25 : -8.4 + ((index * 19) % 100) / 100 * 1.2,
+            Math.sin(angle) * radius,
+          ] as [number, number, number],
+          rotation: [index * 0.41, index * 0.27, index * 0.19] as [number, number, number],
+          scale: (isFloating ? 0.14 : 0.24) + ((index * 13) % 100) / 100 * 0.3,
+          color: isFloating ? '#243b43' : '#3b5358',
+        };
+      }),
+    [count],
+  );
+
+  return (
+    <group>
+      {rocks.map((rock) => (
+        <mesh key={rock.id} position={rock.position} rotation={rock.rotation} scale={rock.scale} castShadow receiveShadow>
+          <icosahedronGeometry args={[1, 1]} />
+          <meshStandardMaterial color={rock.color} roughness={0.92} metalness={0} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function MarineSnow({ quality, paused }: { quality: Quality; paused: boolean }) {
+  const points = useRef<THREE.Points>(null);
+  const count = quality === 'high' ? 560 : 220;
+  const positions = useMemo(() => {
+    const data = new Float32Array(count * 3);
+    for (let index = 0; index < count; index += 1) {
+      const angle = index * 2.618;
+      const radius = 4 + ((index * 53) % 100) / 100 * 27;
+      data[index * 3] = Math.cos(angle) * radius;
+      data[index * 3 + 1] = -8.2 + ((index * 31) % 100) / 100 * 17;
+      data[index * 3 + 2] = Math.sin(angle) * radius;
+    }
+    return data;
+  }, [count]);
+
+  useFrame((_, delta) => {
+    if (paused || !points.current) return;
+
+    const position = points.current.geometry.attributes.position as THREE.BufferAttribute;
+    for (let index = 0; index < count; index += 1) {
+      const xIndex = index * 3;
+      const yIndex = xIndex + 1;
+      position.array[xIndex] = (position.array[xIndex] as number) + Math.sin(index * 0.73) * delta * 0.018;
+      position.array[yIndex] = (position.array[yIndex] as number) - delta * (0.015 + (index % 5) * 0.004);
+      if ((position.array[yIndex] as number) < -8.6) position.array[yIndex] = 9.2;
+    }
+    position.needsUpdate = true;
+  });
+
+  return (
+    <points ref={points}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial size={0.025} color="#d8faff" transparent opacity={0.28} depthWrite={false} />
+    </points>
   );
 }
 

@@ -49,9 +49,9 @@ export function BottomFog() {
         scale={[34, 4.8, 32]}
         seed={0.83}
       />
-      <mesh position={[0, -7.85, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
+      <mesh position={[0, -10.15, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
         <circleGeometry args={[28, 160]} />
-        <meshBasicMaterial color="#031923" transparent opacity={0.14} depthWrite={false} />
+        <meshBasicMaterial color="#031923" transparent opacity={0.09} depthWrite={false} />
       </mesh>
     </group>
   );

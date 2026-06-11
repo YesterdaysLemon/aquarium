@@ -1,32 +1,74 @@
 {
   "fish": [
     {
+      "id": "clownfish",
       "name": "Clownfish",
-      "path": "/assets/fish/Clownfish.glb"
+      "displayName": "Clownfish",
+      "path": "/assets/fish/Clownfish.glb",
+      "icon": "/assets/fish-icons/clownfish.svg",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true
     },
     {
+      "id": "blueTang",
       "name": "BlueTang",
-      "path": "/assets/fish/BlueTang.glb"
+      "displayName": "Blue Tang",
+      "path": "/assets/fish/BlueTang.glb",
+      "icon": "/assets/fish-icons/blue-tang.svg",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true
     },
     {
+      "id": "yellowTang",
       "name": "YellowTang",
-      "path": "/assets/fish/YellowTang.glb"
+      "displayName": "Yellow Tang",
+      "path": "/assets/fish/YellowTang.glb",
+      "icon": "/assets/fish-icons/yellow-tang.svg",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true
     },
     {
+      "id": "goldfish",
       "name": "Goldfish",
-      "path": "/assets/fish/Goldfish.glb"
+      "displayName": "Goldfish",
+      "path": "/assets/fish/Goldfish.glb",
+      "icon": "/assets/fish-icons/goldfish.svg",
+      "schooling": false,
+      "predator": false,
+      "followEligible": true
     },
     {
+      "id": "koi",
       "name": "Koi",
-      "path": "/assets/fish/Koi.glb"
+      "displayName": "Koi",
+      "path": "/assets/fish/Koi.glb",
+      "icon": "/assets/fish-icons/koi.svg",
+      "schooling": false,
+      "predator": false,
+      "followEligible": true
     },
     {
+      "id": "puffer",
       "name": "Puffer",
-      "path": "/assets/fish/Puffer.glb"
+      "displayName": "Puffer",
+      "path": "/assets/fish/Puffer.glb",
+      "icon": "/assets/fish-icons/puffer.svg",
+      "schooling": false,
+      "predator": false,
+      "followEligible": true
     },
     {
+      "id": "shark",
       "name": "Shark",
-      "path": "/assets/fish/Shark.glb"
+      "displayName": "Shark",
+      "path": "/assets/fish/Shark.glb",
+      "icon": "/assets/fish-icons/shark.svg",
+      "schooling": false,
+      "predator": true,
+      "followEligible": true
     }
   ],
   "environment": "/assets/environment/underwater-environment.glb"

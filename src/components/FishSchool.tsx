@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { Quality } from '../App';
 import { environmentColliders, getColliderAvoidance } from '../collision';
+import { fishSpeciesById, type SpeciesId } from '../fishSpecies';
 
 type Props = {
   quality: Quality;
@@ -11,6 +12,7 @@ type Props = {
   showHitboxes: boolean;
   followTarget: RefObject<FollowTarget>;
   followFishIndex: number;
+  selectedSpecies: SpeciesId;
 };
 
 export type FollowTarget = {
@@ -37,12 +39,7 @@ type Agent = {
   phase: number;
 };
 
-type SpeciesId = 'clownfish' | 'blueTang' | 'yellowTang' | 'goldfish' | 'koi' | 'puffer' | 'shark';
-
 type SpeciesConfig = {
-  model: string;
-  schooling: boolean;
-  predator: boolean;
   scale: number;
   hitRadiusScale: number;
   baseSpeed: number;
@@ -52,9 +49,6 @@ type SpeciesConfig = {
 
 const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
   clownfish: {
-    model: '/assets/fish/Clownfish.glb',
-    schooling: true,
-    predator: false,
     scale: 0.58,
     hitRadiusScale: 0.58,
     baseSpeed: 1.18,
@@ -62,9 +56,6 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
     preferredRadius: 14.5,
   },
   blueTang: {
-    model: '/assets/fish/BlueTang.glb',
-    schooling: true,
-    predator: false,
     scale: 0.62,
     hitRadiusScale: 0.56,
     baseSpeed: 1.28,
@@ -72,9 +63,6 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
     preferredRadius: 17,
   },
   yellowTang: {
-    model: '/assets/fish/YellowTang.glb',
-    schooling: true,
-    predator: false,
     scale: 0.58,
     hitRadiusScale: 0.56,
     baseSpeed: 1.32,
@@ -82,9 +70,6 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
     preferredRadius: 19,
   },
   goldfish: {
-    model: '/assets/fish/Goldfish.glb',
-    schooling: false,
-    predator: false,
     scale: 0.72,
     hitRadiusScale: 0.56,
     baseSpeed: 0.92,
@@ -92,9 +77,6 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
     preferredRadius: 13,
   },
   koi: {
-    model: '/assets/fish/Koi.glb',
-    schooling: false,
-    predator: false,
     scale: 0.82,
     hitRadiusScale: 0.56,
     baseSpeed: 0.86,
@@ -102,9 +84,6 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
     preferredRadius: 15,
   },
   puffer: {
-    model: '/assets/fish/Puffer.glb',
-    schooling: false,
-    predator: false,
     scale: 0.7,
     hitRadiusScale: 0.62,
     baseSpeed: 0.72,
@@ -112,9 +91,6 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
     preferredRadius: 12.5,
   },
   shark: {
-    model: '/assets/fish/Shark.glb',
-    schooling: false,
-    predator: true,
     scale: 1.85,
     hitRadiusScale: 0.62,
     baseSpeed: 1.18,
@@ -123,7 +99,7 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
   },
 };
 
-export function FishSchool({ quality, paused, showHitboxes, followTarget, followFishIndex }: Props) {
+export function FishSchool({ quality, paused, showHitboxes, followTarget, followFishIndex, selectedSpecies }: Props) {
   const count = quality === 'high' ? 28 : 14;
   const agents = useMemo(() => createAgents(count), [count]);
 
@@ -131,7 +107,7 @@ export function FishSchool({ quality, paused, showHitboxes, followTarget, follow
     if (!paused) {
       stepSchool(agents, Math.min(delta, 0.033), clock.elapsedTime);
     }
-    updateFollowTarget(agents, followTarget, followFishIndex);
+    updateFollowTarget(agents, followTarget, selectedSpecies, followFishIndex);
   });
 
   return (
@@ -143,16 +119,33 @@ export function FishSchool({ quality, paused, showHitboxes, followTarget, follow
   );
 }
 
-function updateFollowTarget(agents: Agent[], followTarget: RefObject<FollowTarget>, followFishIndex: number) {
+function updateFollowTarget(
+  agents: Agent[],
+  followTarget: RefObject<FollowTarget>,
+  selectedSpecies: SpeciesId,
+  followFishIndex: number,
+) {
   if (!followTarget.current) return;
 
-  const targetAgents = agents.filter((agent) => agent.species === 'blueTang' || agent.species === 'yellowTang');
+  const selectedSpeciesAgents = agents.filter((agent) => agent.species === selectedSpecies);
+  const targetAgents = selectedSpeciesAgents.length > 0
+    ? selectedSpeciesAgents
+    : agents.filter((agent) => fishSpeciesById[agent.species].followEligible);
   if (targetAgents.length === 0) return;
 
-  const selectedIndex = ((followFishIndex % targetAgents.length) + targetAgents.length) % targetAgents.length;
-  const selected = targetAgents[selectedIndex];
+  const rankedTargets = [...targetAgents].sort((a, b) => getFollowScore(b) - getFollowScore(a));
+  const selectedIndex = ((followFishIndex % rankedTargets.length) + rankedTargets.length) % rankedTargets.length;
+  const selected = rankedTargets[selectedIndex];
   followTarget.current.position.copy(selected.position);
   followTarget.current.velocity.copy(selected.velocity);
+}
+
+function getFollowScore(agent: Agent) {
+  const outerRing = agent.orbitRadius * 0.7;
+  const clearHeight = THREE.MathUtils.clamp(agent.position.y + 3, 0, 8) * 0.4;
+  const schoolingBonus = agent.schooling ? 1.2 : 0;
+  const predatorPenalty = agent.predator ? 0.4 : 0;
+  return outerRing + clearHeight + schoolingBonus - predatorPenalty;
 }
 
 function FishAgent({ agent, showHitboxes }: { agent: Agent; showHitboxes: boolean }) {
@@ -227,9 +220,10 @@ function createAgents(count: number): Agent[] {
 
   return species.map((speciesId, index) => {
     const config = speciesConfigs[speciesId];
+    const species = fishSpeciesById[speciesId];
     const speciesIndex = speciesSeen.get(speciesId) ?? 0;
     speciesSeen.set(speciesId, speciesIndex + 1);
-    const angle = config.schooling
+    const angle = species.schooling
       ? schoolAngles[speciesId] + (speciesIndex - 2) * 0.22 + Math.sin(index) * 0.08
       : schoolAngles[speciesId] + speciesIndex * 0.68 + index * 0.11;
     const orbitRadius = config.preferredRadius + ((index % 5) - 2) * 0.9;
@@ -243,9 +237,9 @@ function createAgents(count: number): Agent[] {
     return {
       id: index,
       species: speciesId,
-      model: config.model,
-      schooling: config.schooling,
-      predator: config.predator,
+      model: species.model,
+      schooling: species.schooling,
+      predator: species.predator,
       position,
       velocity: tangent.multiplyScalar(1.3 + (index % 5) * 0.14),
       desiredDepth: depth,
@@ -254,7 +248,7 @@ function createAgents(count: number): Agent[] {
       speedVariation: config.speedVariation + (index % 5) * 0.025,
       speedPhase: index * 1.37,
       speedPulse: 0.18 + (index % 7) * 0.025,
-      scale: config.scale + (config.predator ? 0 : (index % 3) * 0.04),
+      scale: config.scale + (species.predator ? 0 : (index % 3) * 0.04),
       hitRadius: config.scale * config.hitRadiusScale,
       phase: index * 0.73,
     };

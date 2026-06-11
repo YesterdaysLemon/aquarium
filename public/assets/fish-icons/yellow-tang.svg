@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Yellow tang side profile">
+  <defs>
+    <linearGradient id="body" x1="22" x2="132" y1="16" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff37a"/>
+      <stop offset="0.55" stop-color="#ffd42f"/>
+      <stop offset="1" stop-color="#d99b13"/>
+    </linearGradient>
+  </defs>
+  <path fill="#ffd12a" d="M121 40l30-22-5 22 5 22z"/>
+  <path fill="url(#body)" d="M18 40c24-31 78-31 111 0-33 31-87 31-111 0z"/>
+  <path fill="#f0b819" d="M54 23c12-9 33-14 56-3-16 2-32 7-48 17zM55 58c17 8 37 8 58 0-19 14-44 12-59 1z"/>
+  <circle cx="34" cy="35" r="5" fill="#1b1605"/>
+  <circle cx="35.5" cy="33.5" r="1.4" fill="#fff"/>
+  <path fill="#e0a817" d="M75 60l21 13-6-23z"/>
+</svg>

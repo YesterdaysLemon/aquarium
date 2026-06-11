@@ -58,6 +58,7 @@ a {
 
 .brand,
 .controls,
+.fish-panel,
 .credits-link,
 .back-link,
 .loader {
@@ -118,9 +119,15 @@ a {
 
 .icon-button:hover,
 .quality-button:hover,
+.fish-choice:hover,
 .credits-link:hover,
 .back-link:hover {
   background: rgba(157, 239, 255, 0.18);
+}
+
+.icon-button.is-active {
+  color: #03131c;
+  background: #9ff0ff;
 }
 
 .icon-button svg,
@@ -128,6 +135,116 @@ a {
 .back-link svg {
   width: 18px;
   height: 18px;
+}
+
+.fish-panel {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  display: grid;
+  width: min(660px, calc(100% - 220px));
+  gap: 10px;
+  border-radius: 8px;
+  padding: 10px;
+  pointer-events: auto;
+}
+
+.selected-fish {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+}
+
+.selected-fish-icon {
+  width: 76px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.selected-fish-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.selected-fish-copy span {
+  color: #8df0ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.selected-fish-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.05rem;
+}
+
+.selected-fish-copy small {
+  color: rgba(238, 252, 255, 0.72);
+}
+
+.selected-fish-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.fish-picker {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(64px, 1fr));
+  gap: 8px;
+}
+
+.fish-choice {
+  position: relative;
+  display: grid;
+  grid-template-rows: 42px auto;
+  min-width: 0;
+  min-height: 72px;
+  align-items: center;
+  justify-items: center;
+  border: 1px solid rgba(170, 239, 255, 0.14);
+  border-radius: 6px;
+  padding: 6px 5px;
+  color: #eefcff;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+
+.fish-choice::before {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  content: "";
+  pointer-events: none;
+}
+
+.fish-choice.is-selected::before {
+  border-color: var(--species-color);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 0 24px color-mix(in srgb, var(--species-color), transparent 62%);
+}
+
+.fish-choice img {
+  width: 58px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.fish-choice span {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .credits-link {
@@ -249,6 +366,51 @@ a {
     bottom: 12px;
   }
 
+  .fish-panel {
+    left: 12px;
+    right: 12px;
+    bottom: 64px;
+    width: auto;
+    padding: 8px;
+  }
+
+  .selected-fish {
+    grid-template-columns: 62px minmax(0, 1fr) auto;
+    min-height: 60px;
+    gap: 9px;
+  }
+
+  .selected-fish-icon {
+    width: 62px;
+    height: 40px;
+  }
+
+  .selected-fish-actions {
+    gap: 4px;
+  }
+
+  .fish-picker {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .fish-picker::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fish-choice {
+    flex: 0 0 64px;
+    grid-template-rows: 42px;
+    min-height: 56px;
+  }
+
+  .fish-choice span {
+    display: none;
+  }
+
   .credits-page {
     padding: 18px;
   }
@@ -277,6 +439,18 @@ a {
     min-width: 66px;
     gap: 5px;
     padding: 0 6px;
+  }
+
+  .selected-fish-copy strong {
+    font-size: 0.95rem;
+  }
+
+  .selected-fish-copy small {
+    display: none;
+  }
+
+  .fish-panel .icon-button {
+    width: 30px;
   }
 
   .icon-button svg,
