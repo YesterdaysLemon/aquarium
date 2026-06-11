@@ -9,6 +9,7 @@ import type { CameraMode, Quality } from '../App';
 import { environmentColliders } from '../collision';
 import { BottomFog, LightRays } from './AtmosphereEffects';
 import { FishSchool, type FollowTarget } from './FishSchool';
+import { WaterEffects } from './WaterEffects';
 
 type Props = {
   quality: Quality;
@@ -69,7 +70,7 @@ export function AquariumScene({ quality, paused, showHitboxes, cameraMode, camer
         />
         {showHitboxes ? <EnvironmentHitboxes /> : null}
         <Bubbles quality={quality} paused={paused} />
-        <Caustics paused={paused} />
+        <WaterEffects paused={paused} />
       </Suspense>
       {quality === 'high' ? <Stars radius={86} depth={24} count={520} factor={1.5} fade speed={0.25} /> : null}
     </Canvas>
@@ -254,23 +255,5 @@ function Bubbles({ quality, paused }: { quality: Quality; paused: boolean }) {
       </bufferGeometry>
       <pointsMaterial size={0.055} color="#bff8ff" transparent opacity={0.55} depthWrite={false} />
     </points>
-  );
-}
-
-function Caustics({ paused }: { paused: boolean }) {
-  const ref = useRef<THREE.Mesh>(null);
-
-  useFrame(({ clock }) => {
-    if (paused || !ref.current) return;
-    ref.current.rotation.z = clock.elapsedTime * 0.08;
-    const material = ref.current.material as THREE.MeshBasicMaterial;
-    material.opacity = 0.13 + Math.sin(clock.elapsedTime * 0.8) * 0.035;
-  });
-
-  return (
-    <mesh ref={ref} position={[0, -5.9, 0]} rotation={[Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[4, 22, 128, 8]} />
-      <meshBasicMaterial color="#bff7ff" transparent opacity={0.09} blending={THREE.AdditiveBlending} depthWrite={false} />
-    </mesh>
   );
 }
