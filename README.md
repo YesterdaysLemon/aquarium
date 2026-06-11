@@ -23,3 +23,7 @@ Then open `http://localhost:8080`.
 ## Assets
 
 The app serves only optimized web assets from `public/assets`. Raw archives and source model formats stay in `models/` and are excluded from Docker builds.
+
+## Planning
+
+- [Lifelike scene plan](docs/lifelike-scene-plan.md) tracks the current visual audit and the next implementation direction for scene realism, environment assets, fish selection, and camera flow.
