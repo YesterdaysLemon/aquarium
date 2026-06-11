@@ -222,17 +222,22 @@ a {
     left: 12px;
     right: 12px;
     align-items: stretch;
+    gap: 10px;
   }
 
   .brand {
-    min-width: 0;
-    max-width: 46vw;
+    flex: 0 0 56px;
+    justify-content: center;
+    min-width: 56px;
+    padding: 0;
   }
 
   .brand span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    clip: rect(0, 0, 0, 0);
   }
 
   .quality-button {
@@ -250,5 +255,26 @@ a {
 
   .credits-panel {
     margin: 34px auto;
+  }
+}
+
+@media (max-width: 430px) {
+  .controls {
+    gap: 6px;
+    padding: 5px;
+  }
+
+  .icon-button,
+  .quality-button {
+    height: 36px;
+  }
+
+  .icon-button {
+    width: 36px;
+  }
+
+  .quality-button {
+    min-width: 76px;
+    padding: 0 8px;
   }
 }

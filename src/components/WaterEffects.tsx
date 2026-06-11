@@ -15,7 +15,8 @@ function CausticField({ paused }: { paused: boolean }) {
   const material = useAnimatedWaterMaterial({
     color: '#bff7ff',
     mode: 'caustics',
-    opacity: 0.2,
+    opacity: 0.055,
+    depthTest: true,
   });
 
   useFrame((_, delta) => {
@@ -24,8 +25,8 @@ function CausticField({ paused }: { paused: boolean }) {
   });
 
   return (
-    <mesh position={[0, -5.86, 0]} rotation={[Math.PI / 2, 0, 0]} material={material} renderOrder={2}>
-      <planeGeometry args={[50, 50, 1, 1]} />
+    <mesh position={[0, -7.15, 0]} rotation={[Math.PI / 2, 0, 0]} material={material} renderOrder={1}>
+      <circleGeometry args={[26, 160]} />
     </mesh>
   );
 }
@@ -34,7 +35,8 @@ function SurfaceShimmer({ paused }: { paused: boolean }) {
   const material = useAnimatedWaterMaterial({
     color: '#8eefff',
     mode: 'surface',
-    opacity: 0.055,
+    opacity: 0.026,
+    depthTest: false,
   });
 
   useFrame((_, delta) => {
@@ -51,10 +53,12 @@ function SurfaceShimmer({ paused }: { paused: boolean }) {
 
 function useAnimatedWaterMaterial({
   color,
+  depthTest,
   mode,
   opacity,
 }: {
   color: string;
+  depthTest: boolean;
   mode: 'caustics' | 'surface';
   opacity: number;
 }) {
@@ -95,16 +99,16 @@ function useAnimatedWaterMaterial({
           void main() {
             vec2 p = (vUv - 0.5) * 2.0;
             float radial = length(p);
-            float edgeFade = 1.0 - smoothstep(0.54, 1.0, radial);
+            float edgeFade = 1.0 - smoothstep(0.36, 0.92, radial);
             float alpha = 0.0;
 
             if (uMode == 0) {
-              vec2 worldish = vLocalPosition.xz * 0.12;
+              vec2 worldish = vLocalPosition.xz * 0.16;
               float caustic =
                 linePattern(worldish, 0.36, 0.35) *
                 linePattern(worldish * 1.13 + 3.2, -0.22, -0.72);
-              float secondary = linePattern(worldish * 0.76 - 1.1, 0.18, 1.18) * 0.36;
-              alpha = (caustic + secondary) * edgeFade * uOpacity;
+              float secondary = linePattern(worldish * 0.76 - 1.1, 0.18, 1.18) * 0.22;
+              alpha = pow(clamp(caustic + secondary, 0.0, 1.0), 1.7) * edgeFade * uOpacity;
             } else {
               float ripples =
                 sin((p.x + uTime * 0.04) * 16.0) *
@@ -118,10 +122,10 @@ function useAnimatedWaterMaterial({
         `,
         transparent: true,
         depthWrite: false,
-        depthTest: false,
+        depthTest,
         side: THREE.DoubleSide,
         blending: THREE.AdditiveBlending,
       }),
-    [color, mode, opacity],
+    [color, depthTest, mode, opacity],
   );
 }

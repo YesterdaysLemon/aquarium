@@ -21,37 +21,37 @@ export function BottomFog() {
     <group>
       <RaymarchedVolume
         blending={THREE.NormalBlending}
-        color="#b3f8ff"
+        color="#78edf2"
         depthTest={false}
         mode="mist"
-        opacity={1.65}
-        position={[0, -7.45, -1]}
-        scale={[54, 8.4, 54]}
+        opacity={0.82}
+        position={[0, -8.05, -1]}
+        scale={[31, 5.1, 31]}
         seed={0.15}
       />
       <RaymarchedVolume
         blending={THREE.NormalBlending}
-        color="#6be0f2"
+        color="#2ca7b8"
         depthTest={false}
         mode="mist"
-        opacity={1.05}
-        position={[4, -8.8, -4]}
-        scale={[66, 10.2, 60]}
+        opacity={0.72}
+        position={[4, -9.05, -4]}
+        scale={[38, 6.1, 34]}
         seed={0.54}
       />
       <RaymarchedVolume
         blending={THREE.NormalBlending}
-        color="#2d8faa"
+        color="#0d5266"
         depthTest={false}
         mode="mist"
-        opacity={0.84}
-        position={[-5, -9.55, 3]}
-        scale={[58, 9, 56]}
+        opacity={0.66}
+        position={[-5, -9.75, 3]}
+        scale={[33, 5.4, 32]}
         seed={0.83}
       />
-      <mesh position={[0, -4.95, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
-        <circleGeometry args={[25, 128]} />
-        <meshBasicMaterial color="#082d3c" transparent opacity={0.035} depthWrite={false} />
+      <mesh position={[0, -6.85, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
+        <circleGeometry args={[28, 160]} />
+        <meshBasicMaterial color="#031923" transparent opacity={0.18} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -61,10 +61,10 @@ export function LightRays() {
   const rays = useMemo(
     () => [
       { position: [-10, 2.7, -11], rotation: [0.38, 0.18, -0.24], scale: [9, 28, 9], opacity: 0.34, seed: 0.12 },
-      { position: [-2, 3.3, -10], rotation: [0.22, -0.25, 0.16], scale: [7.6, 26, 7.6], opacity: 0.29, seed: 0.47 },
-      { position: [7, 2.9, -11], rotation: [0.34, -0.16, 0.27], scale: [9.6, 30, 9.6], opacity: 0.31, seed: 0.78 },
-      { position: [12, 2.5, -4], rotation: [0.18, 0.2, -0.25], scale: [7, 23, 7], opacity: 0.23, seed: 0.94 },
-      { position: [-14, 2.3, 1], rotation: [0.28, 0.34, -0.31], scale: [7.8, 25, 7.8], opacity: 0.22, seed: 0.31 },
+      { position: [-2, 3.3, -10], rotation: [0.22, -0.25, 0.16], scale: [7.6, 26, 7.6], opacity: 0.25, seed: 0.47 },
+      { position: [7, 2.9, -11], rotation: [0.34, -0.16, 0.27], scale: [9.6, 30, 9.6], opacity: 0.27, seed: 0.78 },
+      { position: [12, 2.5, -4], rotation: [0.18, 0.2, -0.25], scale: [7, 23, 7], opacity: 0.19, seed: 0.94 },
+      { position: [-14, 2.3, 1], rotation: [0.28, 0.34, -0.31], scale: [7.8, 25, 7.8], opacity: 0.18, seed: 0.31 },
     ],
     [],
   );
@@ -121,7 +121,7 @@ function RaymarchedVolume({
 
   return (
     <mesh ref={mesh} position={position} rotation={rotation} scale={scale} material={material} renderOrder={mode === 'mist' ? 3 : 1}>
-      <boxGeometry args={[1, 1, 1, 1, 1, 1]} />
+      <sphereGeometry args={[1, mode === 'mist' ? 64 : 40, mode === 'mist' ? 32 : 20]} />
     </mesh>
   );
 }
@@ -167,15 +167,15 @@ function useRaymarchedVolumeMaterial({
           uniform int uMode;
           varying vec3 vLocalPosition;
 
-          vec2 intersectBox(vec3 ro, vec3 rd) {
-            vec3 invDir = 1.0 / rd;
-            vec3 tMinTemp = (-0.5 - ro) * invDir;
-            vec3 tMaxTemp = (0.5 - ro) * invDir;
-            vec3 tMin = min(tMinTemp, tMaxTemp);
-            vec3 tMax = max(tMinTemp, tMaxTemp);
-            float t0 = max(max(tMin.x, tMin.y), tMin.z);
-            float t1 = min(min(tMax.x, tMax.y), tMax.z);
-            return vec2(t0, t1);
+          vec2 intersectSphere(vec3 ro, vec3 rd) {
+            float b = dot(ro, rd);
+            float c = dot(ro, ro) - 1.0;
+            float h = b * b - c;
+            if (h < 0.0) {
+              return vec2(1.0, -1.0);
+            }
+            h = sqrt(h);
+            return vec2(-b - h, -b + h);
           }
 
           float hash(vec3 p) {
@@ -214,30 +214,32 @@ function useRaymarchedVolumeMaterial({
           }
 
           float mistDensity(vec3 p) {
-            vec3 q = p * 2.0;
-            float radial = length(q.xz);
-            float dome = 1.0 - smoothstep(0.45, 1.08, radial);
-            float topFade = 1.0 - smoothstep(-0.18, 0.82, q.y);
-            float bottomFade = smoothstep(-1.0, -0.58, q.y);
-            float grain = fbm(q * vec3(2.4, 0.72, 2.4) + vec3(uSeed));
-            float pockets = mix(0.7, 1.42, grain);
-            return dome * topFade * bottomFade * pockets;
+            float radial = length(p.xz);
+            float edge = 1.0 - smoothstep(0.52, 0.98, radial);
+            float grain = fbm(p * vec3(2.7, 0.86, 2.7) + vec3(uSeed * 3.1));
+            float raggedY = p.y + (grain - 0.5) * 0.5;
+            float topFade = 1.0 - smoothstep(-0.34, 0.58, raggedY);
+            float bottomFade = smoothstep(-0.96, -0.5, p.y);
+            float lowBank = smoothstep(0.62, -0.24, p.y);
+            float pockets = mix(0.58, 1.28, grain);
+            return edge * topFade * bottomFade * lowBank * pockets;
           }
 
           float rayDensity(vec3 p) {
-            float h = clamp(p.y + 0.5, 0.0, 1.0);
-            float coneRadius = mix(0.42, 0.08, h);
+            float h = clamp(p.y * 0.5 + 0.5, 0.0, 1.0);
+            float coneRadius = mix(0.58, 0.08, h);
             float radial = length(p.xz);
-            float core = 1.0 - smoothstep(coneRadius * 0.22, coneRadius, radial);
-            float vertical = smoothstep(0.02, 0.2, h) * (1.0 - smoothstep(0.68, 1.0, h));
-            float grain = fbm(p * vec3(4.2, 7.8, 4.2) + vec3(uSeed));
-            return core * vertical * smoothstep(0.14, 0.9, grain);
+            float core = 1.0 - smoothstep(coneRadius * 0.18, coneRadius, radial);
+            float vertical = smoothstep(0.03, 0.22, h) * (1.0 - smoothstep(0.72, 1.0, h));
+            float grain = fbm(p * vec3(3.4, 7.2, 3.4) + vec3(uSeed));
+            float lanes = smoothstep(0.18, 0.86, grain);
+            return core * vertical * lanes;
           }
 
           void main() {
             vec3 ro = uCameraLocal;
             vec3 rd = normalize(vLocalPosition - ro);
-            vec2 hit = intersectBox(ro, rd);
+            vec2 hit = intersectSphere(ro, rd);
 
             if (hit.x > hit.y || hit.y < 0.0) {
               discard;
@@ -246,18 +248,18 @@ function useRaymarchedVolumeMaterial({
             float t0 = max(hit.x, 0.0);
             float t1 = hit.y;
             float travel = max(t1 - t0, 0.0);
-            float stepSize = travel / 18.0;
+            float stepSize = travel / 24.0;
             float accumulated = 0.0;
 
-            for (int i = 0; i < 18; i++) {
+            for (int i = 0; i < 24; i++) {
               float t = t0 + (float(i) + 0.5) * stepSize;
               vec3 p = ro + rd * t;
               float density = uMode == 0 ? mistDensity(p) : rayDensity(p);
               accumulated += density * stepSize;
             }
 
-            float alpha = 1.0 - exp(-accumulated * uOpacity * 2.1);
-            alpha = clamp(alpha, 0.0, uMode == 0 ? 0.92 : 0.5);
+            float alpha = 1.0 - exp(-accumulated * uOpacity * (uMode == 0 ? 1.72 : 1.46));
+            alpha = clamp(alpha, 0.0, uMode == 0 ? 0.76 : 0.36);
             gl_FragColor = vec4(uColor, alpha);
           }
         `,

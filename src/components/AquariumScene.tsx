@@ -20,6 +20,7 @@ type Props = {
 };
 
 const environmentPath = '/assets/environment/underwater-environment.glb';
+const bottomShelfPattern = /(floor_plates|floor_modul|sand)/i;
 
 export function AquariumScene({ quality, paused, showHitboxes, cameraMode, cameraResetKey }: Props) {
   const followTarget = useRef<FollowTarget>({
@@ -169,6 +170,12 @@ function EnvironmentAnchor() {
     clone.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
     clone.traverse((object) => {
       if (object instanceof THREE.Mesh) {
+        const label = getMeshLabel(object);
+        if (bottomShelfPattern.test(label)) {
+          object.visible = false;
+          return;
+        }
+
         object.castShadow = true;
         object.receiveShadow = true;
         const materials = Array.isArray(object.material) ? object.material : [object.material];
@@ -189,6 +196,18 @@ function EnvironmentAnchor() {
       <primitive object={scene} />
     </group>
   );
+}
+
+function getMeshLabel(mesh: THREE.Mesh) {
+  const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  const materialLabels = materials.flatMap((material) => {
+    const textured = material as THREE.Material & {
+      map?: THREE.Texture | null;
+      normalMap?: THREE.Texture | null;
+    };
+    return [material.name, textured.map?.name, textured.normalMap?.name];
+  });
+  return [mesh.name, mesh.geometry.name, ...materialLabels].filter(Boolean).join(' ');
 }
 
 function EnvironmentHitboxes() {
