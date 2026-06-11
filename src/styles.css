@@ -260,21 +260,28 @@ a {
 
 @media (max-width: 430px) {
   .controls {
-    gap: 6px;
-    padding: 5px;
+    gap: 4px;
+    padding: 4px;
   }
 
   .icon-button,
   .quality-button {
-    height: 36px;
+    height: 34px;
   }
 
   .icon-button {
-    width: 36px;
+    width: 32px;
   }
 
   .quality-button {
-    min-width: 76px;
-    padding: 0 8px;
+    min-width: 66px;
+    gap: 5px;
+    padding: 0 6px;
+  }
+
+  .icon-button svg,
+  .quality-button svg {
+    width: 17px;
+    height: 17px;
   }
 }

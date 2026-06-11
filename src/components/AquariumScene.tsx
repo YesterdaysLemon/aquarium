@@ -17,12 +17,13 @@ type Props = {
   showHitboxes: boolean;
   cameraMode: CameraMode;
   cameraResetKey: number;
+  followFishIndex: number;
 };
 
 const environmentPath = '/assets/environment/underwater-environment.glb';
 const bottomShelfPattern = /(floor_plates|floor_modul|sand)/i;
 
-export function AquariumScene({ quality, paused, showHitboxes, cameraMode, cameraResetKey }: Props) {
+export function AquariumScene({ quality, paused, showHitboxes, cameraMode, cameraResetKey, followFishIndex }: Props) {
   const followTarget = useRef<FollowTarget>({
     position: new THREE.Vector3(0, 1, 15),
     velocity: new THREE.Vector3(1, 0, 0),
@@ -42,19 +43,19 @@ export function AquariumScene({ quality, paused, showHitboxes, cameraMode, camer
       <ambientLight intensity={0.9} color="#b4efff" />
       <hemisphereLight intensity={1.4} color="#dffcff" groundColor="#0d5361" />
       <directionalLight
-        position={[-8, 17, 10]}
-        intensity={3.4}
+        position={[-10, 18, -12]}
+        intensity={3.7}
         color="#d6fbff"
         castShadow={quality === 'high'}
       />
       <pointLight position={[8, 6, -10]} intensity={7} color="#31b7d7" distance={38} />
       <pointLight position={[-6, 2, 7]} intensity={3.5} color="#79efcf" distance={22} />
       <spotLight
-        position={[0, 10, 16]}
-        target-position={[0, -1, 0]}
-        angle={0.44}
-        penumbra={0.8}
-        intensity={5}
+        position={[-11, 16, -13]}
+        target-position={[3, -2, 1]}
+        angle={0.5}
+        penumbra={0.9}
+        intensity={4.2}
         color="#d6fbff"
         distance={38}
       />
@@ -68,6 +69,7 @@ export function AquariumScene({ quality, paused, showHitboxes, cameraMode, camer
           paused={paused}
           showHitboxes={showHitboxes}
           followTarget={followTarget}
+          followFishIndex={followFishIndex}
         />
         {showHitboxes ? <EnvironmentHitboxes /> : null}
         <Bubbles quality={quality} paused={paused} />
@@ -93,6 +95,9 @@ function CameraRig({
   const desiredLookAt = useRef(new THREE.Vector3());
   const forward = useRef(new THREE.Vector3());
   const outward = useRef(new THREE.Vector3());
+  const lateral = useRef(new THREE.Vector3());
+  const up = useRef(new THREE.Vector3(0, 1, 0));
+  const followLookOffset = useRef(new THREE.Vector3(0, 0.22, 0));
 
   useEffect(() => {
     if (mode === 'overview') {
@@ -118,11 +123,28 @@ function CameraRig({
     }
     outward.current.normalize();
 
+    lateral.current.crossVectors(outward.current, up.current);
+    if (lateral.current.dot(forward.current) < 0) {
+      lateral.current.multiplyScalar(-1);
+    }
+    lateral.current.normalize();
+
+    const targetRadius = Math.max(Math.hypot(target.position.x, target.position.z), 0.001);
+    const cameraRadius = Math.max(targetRadius + 13, 30);
     desiredPosition.current
+      .set(outward.current.x * cameraRadius, target.position.y + 1.2, outward.current.z * cameraRadius)
+      .addScaledVector(lateral.current, -1.8);
+
+    const constrainedRadius = Math.max(Math.hypot(desiredPosition.current.x, desiredPosition.current.z), 0.001);
+    if (constrainedRadius < 30) {
+      desiredPosition.current.x = (desiredPosition.current.x / constrainedRadius) * 30;
+      desiredPosition.current.z = (desiredPosition.current.z / constrainedRadius) * 30;
+    }
+
+    desiredLookAt.current
       .copy(target.position)
-      .addScaledVector(outward.current, 13)
-      .add(new THREE.Vector3(0, 1.7, 0));
-    desiredLookAt.current.copy(target.position).addScaledVector(forward.current, 2.2).add(new THREE.Vector3(0, 0.35, 0));
+      .addScaledVector(lateral.current, 0.45)
+      .add(followLookOffset.current);
 
     camera.position.lerp(desiredPosition.current, 1 - Math.pow(0.001, delta));
     camera.lookAt(desiredLookAt.current);

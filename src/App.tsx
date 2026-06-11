@@ -1,6 +1,6 @@
-import { Anchor, Box, Camera, Gauge, Pause, Play, RotateCcw, Waves } from 'lucide-react';
+import { Anchor, Box, Camera, ChevronLeft, ChevronRight, Gauge, Pause, Play, RotateCcw, Waves } from 'lucide-react';
 import { AquariumScene } from './components/AquariumScene';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export type Quality = 'low' | 'high';
 export type CameraMode = 'overview' | 'follow';
@@ -11,7 +11,23 @@ export function App() {
   const [showHitboxes, setShowHitboxes] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>('overview');
   const [cameraResetKey, setCameraResetKey] = useState(0);
+  const [followFishIndex, setFollowFishIndex] = useState(0);
   const route = useMemo(() => window.location.pathname.replace(/\/+$/, '') || '/', []);
+
+  useEffect(() => {
+    if (cameraMode !== 'follow' || paused) return undefined;
+
+    const timer = window.setInterval(() => {
+      setFollowFishIndex((value) => value + 1);
+    }, 12000);
+
+    return () => window.clearInterval(timer);
+  }, [cameraMode, paused]);
+
+  function switchFollowFish(direction: -1 | 1) {
+    setCameraMode('follow');
+    setFollowFishIndex((value) => value + direction);
+  }
 
   if (route === '/credits') {
     return <CreditsPage />;
@@ -25,6 +41,7 @@ export function App() {
         showHitboxes={showHitboxes}
         cameraMode={cameraMode}
         cameraResetKey={cameraResetKey}
+        followFishIndex={followFishIndex}
       />
       <section className="hud" aria-label="Aquarium controls">
         <div className="brand">
@@ -44,11 +61,29 @@ export function App() {
           <button
             type="button"
             className="icon-button"
-            aria-label={cameraMode === 'follow' ? 'Use overview camera' : 'Follow fish school'}
-            title={cameraMode === 'follow' ? 'Overview camera' : 'Follow school'}
+            aria-label="Previous followed fish"
+            title="Previous fish"
+            onClick={() => switchFollowFish(-1)}
+          >
+            <ChevronLeft aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="icon-button"
+            aria-label={cameraMode === 'follow' ? 'Use overview camera' : 'Follow fish'}
+            title={cameraMode === 'follow' ? 'Overview camera' : 'Follow fish'}
             onClick={() => setCameraMode((value) => (value === 'overview' ? 'follow' : 'overview'))}
           >
             <Camera aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Next followed fish"
+            title="Next fish"
+            onClick={() => switchFollowFish(1)}
+          >
+            <ChevronRight aria-hidden="true" />
           </button>
           <button
             type="button"

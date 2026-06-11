@@ -10,6 +10,7 @@ type Props = {
   paused: boolean;
   showHitboxes: boolean;
   followTarget: RefObject<FollowTarget>;
+  followFishIndex: number;
 };
 
 export type FollowTarget = {
@@ -122,14 +123,15 @@ const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
   },
 };
 
-export function FishSchool({ quality, paused, showHitboxes, followTarget }: Props) {
+export function FishSchool({ quality, paused, showHitboxes, followTarget, followFishIndex }: Props) {
   const count = quality === 'high' ? 28 : 14;
   const agents = useMemo(() => createAgents(count), [count]);
 
   useFrame(({ clock }, delta) => {
-    if (paused) return;
-    stepSchool(agents, Math.min(delta, 0.033), clock.elapsedTime);
-    updateFollowTarget(agents, followTarget);
+    if (!paused) {
+      stepSchool(agents, Math.min(delta, 0.033), clock.elapsedTime);
+    }
+    updateFollowTarget(agents, followTarget, followFishIndex);
   });
 
   return (
@@ -141,23 +143,16 @@ export function FishSchool({ quality, paused, showHitboxes, followTarget }: Prop
   );
 }
 
-function updateFollowTarget(agents: Agent[], followTarget: RefObject<FollowTarget>) {
+function updateFollowTarget(agents: Agent[], followTarget: RefObject<FollowTarget>, followFishIndex: number) {
   if (!followTarget.current) return;
 
-  const school = agents.filter((agent) => agent.species === 'blueTang');
-  const targetAgents = school.length >= 2 ? school : agents.filter((agent) => agent.schooling);
+  const targetAgents = agents.filter((agent) => agent.species === 'blueTang' || agent.species === 'yellowTang');
   if (targetAgents.length === 0) return;
 
-  followTarget.current.position.set(0, 0, 0);
-  followTarget.current.velocity.set(0, 0, 0);
-
-  for (const agent of targetAgents) {
-    followTarget.current.position.add(agent.position);
-    followTarget.current.velocity.add(agent.velocity);
-  }
-
-  followTarget.current.position.divideScalar(targetAgents.length);
-  followTarget.current.velocity.divideScalar(targetAgents.length);
+  const selectedIndex = ((followFishIndex % targetAgents.length) + targetAgents.length) % targetAgents.length;
+  const selected = targetAgents[selectedIndex];
+  followTarget.current.position.copy(selected.position);
+  followTarget.current.velocity.copy(selected.velocity);
 }
 
 function FishAgent({ agent, showHitboxes }: { agent: Agent; showHitboxes: boolean }) {

@@ -22,36 +22,36 @@ export function BottomFog() {
       <RaymarchedVolume
         blending={THREE.NormalBlending}
         color="#78edf2"
-        depthTest={false}
+        depthTest
         mode="mist"
-        opacity={0.82}
-        position={[0, -8.05, -1]}
-        scale={[31, 5.1, 31]}
+        opacity={0.58}
+        position={[0, -9.05, -1]}
+        scale={[30, 3.7, 30]}
         seed={0.15}
       />
       <RaymarchedVolume
         blending={THREE.NormalBlending}
         color="#2ca7b8"
-        depthTest={false}
+        depthTest
         mode="mist"
-        opacity={0.72}
-        position={[4, -9.05, -4]}
-        scale={[38, 6.1, 34]}
+        opacity={0.62}
+        position={[4, -9.85, -4]}
+        scale={[37, 4.3, 34]}
         seed={0.54}
       />
       <RaymarchedVolume
         blending={THREE.NormalBlending}
         color="#0d5266"
-        depthTest={false}
+        depthTest
         mode="mist"
-        opacity={0.66}
-        position={[-5, -9.75, 3]}
-        scale={[33, 5.4, 32]}
+        opacity={0.7}
+        position={[-5, -10.55, 3]}
+        scale={[34, 4.8, 32]}
         seed={0.83}
       />
-      <mesh position={[0, -6.85, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
+      <mesh position={[0, -7.85, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
         <circleGeometry args={[28, 160]} />
-        <meshBasicMaterial color="#031923" transparent opacity={0.18} depthWrite={false} />
+        <meshBasicMaterial color="#031923" transparent opacity={0.14} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -60,14 +60,15 @@ export function BottomFog() {
 export function LightRays() {
   const rays = useMemo(
     () => [
-      { position: [-10, 2.7, -11], rotation: [0.38, 0.18, -0.24], scale: [9, 28, 9], opacity: 0.34, seed: 0.12 },
-      { position: [-2, 3.3, -10], rotation: [0.22, -0.25, 0.16], scale: [7.6, 26, 7.6], opacity: 0.25, seed: 0.47 },
-      { position: [7, 2.9, -11], rotation: [0.34, -0.16, 0.27], scale: [9.6, 30, 9.6], opacity: 0.27, seed: 0.78 },
-      { position: [12, 2.5, -4], rotation: [0.18, 0.2, -0.25], scale: [7, 23, 7], opacity: 0.19, seed: 0.94 },
-      { position: [-14, 2.3, 1], rotation: [0.28, 0.34, -0.31], scale: [7.8, 25, 7.8], opacity: 0.18, seed: 0.31 },
+      { position: [-14, 3.3, -14], scale: [3.8, 31, 3.8], opacity: 0.2, seed: 0.12 },
+      { position: [-7, 3.2, -12], scale: [3.4, 30, 3.4], opacity: 0.17, seed: 0.47 },
+      { position: [0, 3.1, -10], scale: [4.2, 32, 4.2], opacity: 0.18, seed: 0.78 },
+      { position: [8, 2.9, -8], scale: [3.5, 29, 3.5], opacity: 0.15, seed: 0.94 },
+      { position: [15, 2.7, -6], scale: [3.1, 28, 3.1], opacity: 0.13, seed: 0.31 },
     ],
     [],
   );
+  const rayRotation: [number, number, number] = [0.14, 0, -0.18];
 
   return (
     <group>
@@ -80,7 +81,7 @@ export function LightRays() {
           mode="ray"
           opacity={ray.opacity}
           position={ray.position as [number, number, number]}
-          rotation={ray.rotation as [number, number, number]}
+          rotation={rayRotation}
           scale={ray.scale as [number, number, number]}
           seed={ray.seed}
         />
@@ -121,7 +122,11 @@ function RaymarchedVolume({
 
   return (
     <mesh ref={mesh} position={position} rotation={rotation} scale={scale} material={material} renderOrder={mode === 'mist' ? 3 : 1}>
-      <sphereGeometry args={[1, mode === 'mist' ? 64 : 40, mode === 'mist' ? 32 : 20]} />
+      {mode === 'mist' ? (
+        <sphereGeometry args={[1, 64, 32]} />
+      ) : (
+        <cylinderGeometry args={[1, 1, 1, 40, 1, false]} />
+      )}
     </mesh>
   );
 }
@@ -178,6 +183,30 @@ function useRaymarchedVolumeMaterial({
             return vec2(-b - h, -b + h);
           }
 
+          vec2 intersectCylinder(vec3 ro, vec3 rd) {
+            vec2 side = vec2(-100000.0, 100000.0);
+            float a = dot(rd.xz, rd.xz);
+            float c = dot(ro.xz, ro.xz) - 1.0;
+
+            if (a > 0.0001) {
+              float b = 2.0 * dot(ro.xz, rd.xz);
+              float h = b * b - 4.0 * a * c;
+              if (h < 0.0) {
+                return vec2(1.0, -1.0);
+              }
+              h = sqrt(h);
+              side = vec2((-b - h) / (2.0 * a), (-b + h) / (2.0 * a));
+            } else if (c > 0.0) {
+              return vec2(1.0, -1.0);
+            }
+
+            float dy = abs(rd.y) < 0.0001 ? (rd.y < 0.0 ? -0.0001 : 0.0001) : rd.y;
+            vec2 cap = vec2((-0.5 - ro.y) / dy, (0.5 - ro.y) / dy);
+            float yMin = min(cap.x, cap.y);
+            float yMax = max(cap.x, cap.y);
+            return vec2(max(side.x, yMin), min(side.y, yMax));
+          }
+
           float hash(vec3 p) {
             return fract(sin(dot(p, vec3(127.1, 311.7, 74.7)) + uSeed * 97.3) * 43758.5453123);
           }
@@ -226,20 +255,19 @@ function useRaymarchedVolumeMaterial({
           }
 
           float rayDensity(vec3 p) {
-            float h = clamp(p.y * 0.5 + 0.5, 0.0, 1.0);
-            float coneRadius = mix(0.58, 0.08, h);
+            float h = clamp(p.y + 0.5, 0.0, 1.0);
             float radial = length(p.xz);
-            float core = 1.0 - smoothstep(coneRadius * 0.18, coneRadius, radial);
-            float vertical = smoothstep(0.03, 0.22, h) * (1.0 - smoothstep(0.72, 1.0, h));
-            float grain = fbm(p * vec3(3.4, 7.2, 3.4) + vec3(uSeed));
-            float lanes = smoothstep(0.18, 0.86, grain);
+            float core = 1.0 - smoothstep(0.34, 0.94, radial);
+            float vertical = smoothstep(0.03, 0.18, h) * (1.0 - smoothstep(0.78, 1.0, h));
+            float grain = fbm(p * vec3(4.8, 5.2, 4.8) + vec3(uSeed));
+            float lanes = smoothstep(0.22, 0.88, grain);
             return core * vertical * lanes;
           }
 
           void main() {
             vec3 ro = uCameraLocal;
             vec3 rd = normalize(vLocalPosition - ro);
-            vec2 hit = intersectSphere(ro, rd);
+            vec2 hit = uMode == 0 ? intersectSphere(ro, rd) : intersectCylinder(ro, rd);
 
             if (hit.x > hit.y || hit.y < 0.0) {
               discard;
