@@ -23,6 +23,7 @@ type Props = {
 };
 
 const environmentPath = '/assets/environment/underwater-environment.glb';
+const hiddenEnvironmentMeshes = new Set(['Object1040']);
 
 export function AquariumScene({
   quality,
@@ -73,7 +74,6 @@ export function AquariumScene({
         <LightRays />
         <BottomFog />
         <EnvironmentAnchor />
-        <ReefDebris quality={quality} />
         <FishSchool
           quality={quality}
           paused={paused}
@@ -204,6 +204,11 @@ function EnvironmentAnchor() {
     clone.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
     clone.traverse((object) => {
       if (object instanceof THREE.Mesh) {
+        if (hiddenEnvironmentMeshes.has(object.name)) {
+          object.visible = false;
+          return;
+        }
+
         object.castShadow = true;
         object.receiveShadow = true;
         const materials = Array.isArray(object.material) ? object.material : [object.material];
@@ -253,41 +258,6 @@ function OceanVolume() {
         <circleGeometry args={[32, 128]} />
         <meshBasicMaterial color="#031724" transparent opacity={0.32} depthWrite={false} />
       </mesh>
-    </group>
-  );
-}
-
-function ReefDebris({ quality }: { quality: Quality }) {
-  const count = quality === 'high' ? 26 : 12;
-  const rocks = useMemo(
-    () =>
-      Array.from({ length: count }, (_, index) => {
-        const angle = index * 2.17;
-        const radius = 7 + ((index * 37) % 100) / 100 * 18;
-        const isFloating = index % 5 === 0;
-        return {
-          id: index,
-          position: [
-            Math.cos(angle) * radius,
-            isFloating ? -3.8 + (index % 4) * 1.25 : -8.4 + ((index * 19) % 100) / 100 * 1.2,
-            Math.sin(angle) * radius,
-          ] as [number, number, number],
-          rotation: [index * 0.41, index * 0.27, index * 0.19] as [number, number, number],
-          scale: (isFloating ? 0.14 : 0.24) + ((index * 13) % 100) / 100 * 0.3,
-          color: isFloating ? '#243b43' : '#3b5358',
-        };
-      }),
-    [count],
-  );
-
-  return (
-    <group>
-      {rocks.map((rock) => (
-        <mesh key={rock.id} position={rock.position} rotation={rock.rotation} scale={rock.scale} castShadow receiveShadow>
-          <icosahedronGeometry args={[1, 1]} />
-          <meshStandardMaterial color={rock.color} roughness={0.92} metalness={0} />
-        </mesh>
-      ))}
     </group>
   );
 }

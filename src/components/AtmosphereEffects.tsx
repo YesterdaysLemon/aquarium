@@ -60,11 +60,11 @@ export function BottomFog() {
 export function LightRays() {
   const rays = useMemo(
     () => [
-      { position: [-14, 3.3, -14], scale: [3.8, 31, 3.8], opacity: 0.2, seed: 0.12 },
-      { position: [-7, 3.2, -12], scale: [3.4, 30, 3.4], opacity: 0.17, seed: 0.47 },
-      { position: [0, 3.1, -10], scale: [4.2, 32, 4.2], opacity: 0.18, seed: 0.78 },
-      { position: [8, 2.9, -8], scale: [3.5, 29, 3.5], opacity: 0.15, seed: 0.94 },
-      { position: [15, 2.7, -6], scale: [3.1, 28, 3.1], opacity: 0.13, seed: 0.31 },
+      { position: [-10.8, 3.25, -14.3], scale: [3.7, 31, 3.7], opacity: 0.18, seed: 0.12 },
+      { position: [9.4, 2.95, -12.6], scale: [3.35, 29, 3.35], opacity: 0.15, seed: 0.47 },
+      { position: [0.7, 3.35, -8.8], scale: [4.15, 32, 4.15], opacity: 0.18, seed: 0.78 },
+      { position: [-12.1, 2.75, -4.2], scale: [3.25, 28, 3.25], opacity: 0.13, seed: 0.94 },
+      { position: [10.6, 2.85, -3.5], scale: [3.45, 28, 3.45], opacity: 0.14, seed: 0.31 },
     ],
     [],
   );
