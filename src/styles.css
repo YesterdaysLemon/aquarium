@@ -93,8 +93,7 @@ a {
   pointer-events: auto;
 }
 
-.icon-button,
-.quality-button {
+.icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -110,15 +109,7 @@ a {
   width: 38px;
 }
 
-.quality-button {
-  gap: 7px;
-  min-width: 86px;
-  padding: 0 10px;
-  text-transform: uppercase;
-}
-
 .icon-button:hover,
-.quality-button:hover,
 .fish-choice:hover,
 .credits-link:hover,
 .back-link:hover {
@@ -131,7 +122,6 @@ a {
 }
 
 .icon-button svg,
-.quality-button svg,
 .back-link svg {
   width: 18px;
   height: 18px;
@@ -357,10 +347,6 @@ a {
     clip: rect(0, 0, 0, 0);
   }
 
-  .quality-button {
-    min-width: 72px;
-  }
-
   .credits-link {
     right: 12px;
     bottom: 12px;
@@ -426,19 +412,12 @@ a {
     padding: 4px;
   }
 
-  .icon-button,
-  .quality-button {
+  .icon-button {
     height: 34px;
   }
 
   .icon-button {
     width: 32px;
-  }
-
-  .quality-button {
-    min-width: 66px;
-    gap: 5px;
-    padding: 0 6px;
   }
 
   .selected-fish-copy strong {
@@ -453,8 +432,7 @@ a {
     width: 30px;
   }
 
-  .icon-button svg,
-  .quality-button svg {
+  .icon-button svg {
     width: 17px;
     height: 17px;
   }

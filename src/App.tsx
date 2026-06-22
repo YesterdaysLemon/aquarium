@@ -1,4 +1,4 @@
-import { Anchor, Box, Camera, ChevronLeft, ChevronRight, Gauge, Pause, Play, RotateCcw, Shuffle, Waves } from 'lucide-react';
+import { Anchor, Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, Waves } from 'lucide-react';
 import { AquariumScene } from './components/AquariumScene';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { fishSpecies, fishSpeciesById, followableFishSpecies, normalizeSpeciesIndex, type SpeciesId } from './fishSpecies';
@@ -7,10 +7,8 @@ export type Quality = 'low' | 'high';
 export type CameraMode = 'overview' | 'follow';
 
 export function App() {
-  const [quality, setQuality] = useState<Quality>('high');
   const [paused, setPaused] = useState(false);
-  const [showHitboxes, setShowHitboxes] = useState(false);
-  const [cameraMode, setCameraMode] = useState<CameraMode>('overview');
+  const [cameraMode, setCameraMode] = useState<CameraMode>('follow');
   const [cameraResetKey, setCameraResetKey] = useState(0);
   const [followFishIndex, setFollowFishIndex] = useState(0);
   const [selectedSpecies, setSelectedSpecies] = useState<SpeciesId>('blueTang');
@@ -61,9 +59,9 @@ export function App() {
   return (
     <main className="app-shell">
       <AquariumScene
-        quality={quality}
+        quality="high"
         paused={paused}
-        showHitboxes={showHitboxes}
+        showHitboxes={false}
         cameraMode={cameraMode}
         cameraResetKey={cameraResetKey}
         followFishIndex={followFishIndex}
@@ -96,30 +94,11 @@ export function App() {
           <button
             type="button"
             className="icon-button"
-            aria-label={showHitboxes ? 'Hide hitboxes' : 'Show hitboxes'}
-            title={showHitboxes ? 'Hide hitboxes' : 'Show hitboxes'}
-            onClick={() => setShowHitboxes((value) => !value)}
-          >
-            <Box aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="icon-button"
             aria-label="Reset camera"
             title="Reset camera"
             onClick={() => setCameraResetKey((value) => value + 1)}
           >
             <RotateCcw aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="quality-button"
-            aria-label={`Quality is ${quality}`}
-            title="Toggle quality"
-            onClick={() => setQuality((value) => (value === 'high' ? 'low' : 'high'))}
-          >
-            <Gauge aria-hidden="true" />
-            <span>{quality}</span>
           </button>
         </div>
       </section>
