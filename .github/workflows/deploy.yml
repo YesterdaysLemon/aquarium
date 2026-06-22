@@ -1,0 +1,55 @@
+name: Validate and deploy
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run --if-present typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Notify deploy manager
+        env:
+          DEPLOY_WEBHOOK_SECRET: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}
+          DEPLOY_WEBHOOK_URL: https://deploy.alirezaafshan.com/deploy/aquarium
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          test -n "$DEPLOY_WEBHOOK_URL"
+          test -n "$DEPLOY_WEBHOOK_SECRET"
+
+          payload="$(node -e 'const payload = { event: process.env.GITHUB_EVENT_NAME, branch: process.env.GITHUB_REF_NAME, repo: process.env.GITHUB_REPOSITORY, sha: process.env.GITHUB_SHA }; process.stdout.write(JSON.stringify(payload));')"
+          signature="$(node -e 'const crypto = require("crypto"); const secret = process.env.DEPLOY_WEBHOOK_SECRET; const payload = process.argv[1]; process.stdout.write("sha256=" + crypto.createHmac("sha256", secret).update(payload).digest("hex"));' "$payload")"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST "$DEPLOY_WEBHOOK_URL" \
+            --header "Content-Type: application/json" \
+            --header "X-GitHub-Event: push" \
+            --header "X-Hub-Signature-256: $signature" \
+            --data "$payload"
