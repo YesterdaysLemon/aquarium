@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 80" role="img" aria-label="Shark side profile">
+  <defs>
+    <linearGradient id="body" x1="22" x2="145" y1="22" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b8c6c9"/>
+      <stop offset="0.5" stop-color="#637b83"/>
+      <stop offset="1" stop-color="#273941"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#body)" d="M12 43c33-27 95-33 139-6-37 35-105 33-139 6z"/>
+  <path fill="#dce5e5" d="M42 50c30 7 70 7 103-9-29 25-76 29-103 9z"/>
+  <path fill="#30444d" d="M82 25l21-22 6 32zM146 38l27-20-8 22 8 22z"/>
+  <path fill="#3f565e" d="M91 57l23 18-8-28z"/>
+  <circle cx="35" cy="36" r="4" fill="#101719"/>
+  <path fill="#18252a" d="M45 43c10 3 23 3 35 0-10 7-24 8-35 0z"/>
+</svg>

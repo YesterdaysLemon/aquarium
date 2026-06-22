@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Blue tang side profile">
+  <defs>
+    <linearGradient id="body" x1="22" x2="128" y1="18" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1b5cff"/>
+      <stop offset="0.58" stop-color="#102da7"/>
+      <stop offset="1" stop-color="#08124f"/>
+    </linearGradient>
+  </defs>
+  <path fill="#f6d12d" d="M124 40l29-20-4 20 4 20z"/>
+  <path fill="url(#body)" d="M18 41c19-27 78-35 112-1-32 33-92 30-112 1z"/>
+  <path fill="#07123f" d="M43 25c24 2 52 15 75 36-23-8-44-8-68-3 12-9 12-22-7-33z"/>
+  <path fill="#f4cf2e" d="M90 24c9 2 22 9 32 17-13-3-24-2-35 0z"/>
+  <circle cx="35" cy="35" r="5" fill="#0a0e26"/>
+  <circle cx="36.5" cy="33.5" r="1.4" fill="#fff"/>
+  <path fill="#08124f" d="M75 62l24 12-8-22z"/>
+</svg>

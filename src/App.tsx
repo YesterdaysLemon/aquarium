@@ -1,32 +1,55 @@
-import { Anchor, Box, Camera, ChevronLeft, ChevronRight, Gauge, Pause, Play, RotateCcw, Waves } from 'lucide-react';
+import { Anchor, Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, Waves } from 'lucide-react';
 import { AquariumScene } from './components/AquariumScene';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { fishSpecies, fishSpeciesById, followableFishSpecies, normalizeSpeciesIndex, type SpeciesId } from './fishSpecies';
 
 export type Quality = 'low' | 'high';
 export type CameraMode = 'overview' | 'follow';
 
 export function App() {
-  const [quality, setQuality] = useState<Quality>('high');
   const [paused, setPaused] = useState(false);
-  const [showHitboxes, setShowHitboxes] = useState(false);
-  const [cameraMode, setCameraMode] = useState<CameraMode>('overview');
+  const [cameraMode, setCameraMode] = useState<CameraMode>('follow');
   const [cameraResetKey, setCameraResetKey] = useState(0);
   const [followFishIndex, setFollowFishIndex] = useState(0);
+  const [selectedSpecies, setSelectedSpecies] = useState<SpeciesId>('blueTang');
+  const [autoFollow, setAutoFollow] = useState(true);
+  const [autoTourStep, setAutoTourStep] = useState(0);
   const route = useMemo(() => window.location.pathname.replace(/\/+$/, '') || '/', []);
+  const selectedSpeciesInfo = fishSpeciesById[selectedSpecies];
 
   useEffect(() => {
-    if (cameraMode !== 'follow' || paused) return undefined;
+    if (cameraMode !== 'follow' || paused || !autoFollow) return undefined;
 
     const timer = window.setInterval(() => {
-      setFollowFishIndex((value) => value + 1);
-    }, 12000);
+      setAutoTourStep((value) => value + 1);
+    }, 10000);
 
     return () => window.clearInterval(timer);
-  }, [cameraMode, paused]);
+  }, [autoFollow, cameraMode, paused]);
+
+  useEffect(() => {
+    if (cameraMode !== 'follow' || !autoFollow || autoTourStep === 0) return;
+
+    const species = followableFishSpecies[normalizeSpeciesIndex(autoTourStep)];
+    setSelectedSpecies(species.id);
+    setFollowFishIndex((value) => value + 1);
+  }, [autoFollow, autoTourStep, cameraMode]);
 
   function switchFollowFish(direction: -1 | 1) {
     setCameraMode('follow');
+    setAutoFollow(false);
     setFollowFishIndex((value) => value + direction);
+  }
+
+  function selectSpecies(speciesId: SpeciesId) {
+    setSelectedSpecies(speciesId);
+    setFollowFishIndex(0);
+    setCameraMode('follow');
+    setAutoFollow(false);
+  }
+
+  function toggleFollowMode() {
+    setCameraMode((value) => (value === 'overview' ? 'follow' : 'overview'));
   }
 
   if (route === '/credits') {
@@ -36,12 +59,13 @@ export function App() {
   return (
     <main className="app-shell">
       <AquariumScene
-        quality={quality}
+        quality="high"
         paused={paused}
-        showHitboxes={showHitboxes}
+        showHitboxes={false}
         cameraMode={cameraMode}
         cameraResetKey={cameraResetKey}
         followFishIndex={followFishIndex}
+        selectedSpecies={selectedSpecies}
       />
       <section className="hud" aria-label="Aquarium controls">
         <div className="brand">
@@ -61,38 +85,11 @@ export function App() {
           <button
             type="button"
             className="icon-button"
-            aria-label="Previous followed fish"
-            title="Previous fish"
-            onClick={() => switchFollowFish(-1)}
-          >
-            <ChevronLeft aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="icon-button"
             aria-label={cameraMode === 'follow' ? 'Use overview camera' : 'Follow fish'}
             title={cameraMode === 'follow' ? 'Overview camera' : 'Follow fish'}
-            onClick={() => setCameraMode((value) => (value === 'overview' ? 'follow' : 'overview'))}
+            onClick={toggleFollowMode}
           >
             <Camera aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="icon-button"
-            aria-label="Next followed fish"
-            title="Next fish"
-            onClick={() => switchFollowFish(1)}
-          >
-            <ChevronRight aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="icon-button"
-            aria-label={showHitboxes ? 'Hide hitboxes' : 'Show hitboxes'}
-            title={showHitboxes ? 'Hide hitboxes' : 'Show hitboxes'}
-            onClick={() => setShowHitboxes((value) => !value)}
-          >
-            <Box aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -103,16 +100,64 @@ export function App() {
           >
             <RotateCcw aria-hidden="true" />
           </button>
-          <button
-            type="button"
-            className="quality-button"
-            aria-label={`Quality is ${quality}`}
-            title="Toggle quality"
-            onClick={() => setQuality((value) => (value === 'high' ? 'low' : 'high'))}
-          >
-            <Gauge aria-hidden="true" />
-            <span>{quality}</span>
-          </button>
+        </div>
+      </section>
+      <section className="fish-panel" aria-label="Fish selection">
+        <div className="selected-fish">
+          <img src={selectedSpeciesInfo.icon} alt="" className="selected-fish-icon" />
+          <div className="selected-fish-copy">
+            <span>{cameraMode === 'follow' ? (autoFollow ? 'Auto tour' : 'Following') : 'Selected'}</span>
+            <strong>{selectedSpeciesInfo.displayName}</strong>
+            <small>{selectedSpeciesInfo.predator ? 'Predator' : selectedSpeciesInfo.schooling ? 'Schooling' : 'Solitary'}</small>
+          </div>
+          <div className="selected-fish-actions">
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Previous followed fish"
+              title="Previous fish"
+              onClick={() => switchFollowFish(-1)}
+            >
+              <ChevronLeft aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className={`icon-button ${autoFollow ? 'is-active' : ''}`}
+              aria-label={autoFollow ? 'Disable auto fish tour' : 'Enable auto fish tour'}
+              title="Auto tour"
+              onClick={() => {
+                setCameraMode('follow');
+                setAutoFollow((value) => !value);
+              }}
+            >
+              <Shuffle aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Next followed fish"
+              title="Next fish"
+              onClick={() => switchFollowFish(1)}
+            >
+              <ChevronRight aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+        <div className="fish-picker" aria-label="Choose fish species">
+          {fishSpecies.map((species) => (
+            <button
+              type="button"
+              key={species.id}
+              className={`fish-choice ${species.id === selectedSpecies ? 'is-selected' : ''}`}
+              aria-label={`Follow ${species.displayName}`}
+              title={species.displayName}
+              onClick={() => selectSpecies(species.id)}
+              style={{ '--species-color': species.color } as CSSProperties}
+            >
+              <img src={species.icon} alt="" />
+              <span>{species.displayName}</span>
+            </button>
+          ))}
         </div>
       </section>
       <a className="credits-link" href="/credits">

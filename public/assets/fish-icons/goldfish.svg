@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Goldfish side profile">
+  <defs>
+    <linearGradient id="body" x1="20" x2="118" y1="20" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe19a"/>
+      <stop offset="0.48" stop-color="#f29a2e"/>
+      <stop offset="1" stop-color="#c55e14"/>
+    </linearGradient>
+  </defs>
+  <path fill="#f1972d" d="M118 40c12-14 22-20 35-21-8 9-9 17-1 21-8 4-7 12 1 21-13-1-23-7-35-21z"/>
+  <path fill="url(#body)" d="M17 41c18-23 66-30 103-1-32 29-84 27-103 1z"/>
+  <path fill="#e2771e" d="M66 58l23 16-7-24zM68 21l23-15-8 25z"/>
+  <path fill="#ffd48c" opacity=".58" d="M42 29c19-8 45-5 64 9-25-6-49-6-70 2z"/>
+  <circle cx="33" cy="35" r="5" fill="#22150b"/>
+  <circle cx="34.5" cy="33.5" r="1.4" fill="#fff"/>
+</svg>

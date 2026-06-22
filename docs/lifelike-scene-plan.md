@@ -1,21 +1,21 @@
 # Lifelike Aquarium Scene Plan
 
-This document is a planning and visual-audit pass for the next implementation phase. It is based on the current React Three Fiber aquarium, current optimized assets, and browser screenshots taken from the local app on 2026-06-11.
+This document is a planning and visual-audit pass for the next implementation phase. It is based on the current React Three Fiber aquarium, current optimized assets, and browser screenshots taken from the local app on 2026-06-11. The intended composition remains a central reef inside a cylindrical ocean slice.
 
 ## Current-State Findings
 
 ### Scene And Composition
 
-- The reef is visually readable, but it still presents as a single suspended rock column rather than a piece of ocean floor. The hidden sand/floor meshes solved earlier clipping and fog issues, but the scene now needs a designed grounding layer so the reef feels like it rises from an environment instead of floating.
+- The reef is visually readable as the central anchor of the ocean slice. The hidden sand/floor meshes solved earlier clipping and fog issues, but the baked sandbar should be restored and tuned because the larger source model already provides a good central reef-and-seabed composition.
 - The bottom mist hides the empty base, but it is now doing too much worldbuilding work. It should become one layer in a fuller seabed system: sand slope, rock rubble, sediment clouds, small suspended particles, and distant fade.
-- The cylindrical aquarium boundary is mostly hidden, but the scene still feels staged around a central object. Future work should create off-center parallax: foreground kelp, midground reef, background haze and shadowed rock silhouettes.
+- The cylindrical aquarium boundary is mostly hidden. Keep the central-object composition, but add stronger foreground/background parallax around it: foreground kelp, midground reef, background haze, and shadowed rock silhouettes.
 - The light rays are coherent and stable, but they still read as graphic shafts rather than sunlight filtered through a moving surface. They need surface-caustic linkage, varied opacity, softer falloff, and fewer repeated lanes.
 
 ### Reef And Environment Asset
 
 - The environment GLB is about 12.5 MB and already uses meshopt, WebP textures, and quantization. It is not tiny, but the current visual bottleneck is art direction more than raw weight.
-- The source model includes sand/floor meshes and sand textures, but the floor meshes are currently hidden at runtime to avoid clipping and fog-overdraw artifacts.
-- Kelp is the weakest visible element. The current tall green strips are low-poly, rigid, and visibly segmented. The repeated triangular leaf silhouettes make the scene feel stylized in a way that does not match the rock texture fidelity.
+- The source model includes baked sand/floor meshes, kelp, and sand textures. These should remain part of the baseline environment instead of being hidden wholesale.
+- Kelp is baked into the model and should be preserved, but it can be supplemented by foreground/background fronds, sway shaders, particles, and lighting so the baked geometry reads less rigid.
 - There is not enough secondary environment detail: floating rocks, rubble, shells, suspended debris, small coral/sea plants, and far-background silhouettes are missing.
 - The reef texture is acceptable from overview, but in follow camera the close rock surface becomes repetitive and high-contrast. The camera plan should account for close-up material limits.
 
@@ -47,26 +47,27 @@ The user flow should support three modes:
 
 ### Grounding The Reef
 
-- Replace the current hidden-floor workaround with a deliberate seabed layer:
-  - A broad, shallow sand bowl below the reef, with edges always below the main camera line.
+- Replace the current hidden-floor workaround with a tuned version of the baked seabed:
+  - Restore the baked sand/floor meshes and control their visibility with lighting, haze, and camera framing rather than broad runtime hiding.
+  - Keep a broad, shallow sand read below the reef, with edges always below the main camera line.
   - A low-opacity sediment/mist volume hugging the bowl instead of covering the reef.
   - Rock rubble and small broken stones around the base to break the silhouette.
   - A few detached floating or fallen rocks at varying depths to create scale and parallax.
 - Keep the visible sand floor subtle. It should appear through haze near the reef base, not as a bright flat platform.
-- Split the environment asset into authored layers:
-  - `reef-core.glb`: main rock structure, ship/chest props, non-floor hard-surface details.
-  - `seabed.glb`: sand bowl and low rubble.
-  - `vegetation.glb`: kelp/grass clusters, ideally replaceable.
+- If future asset work is needed, split the environment only for optimization and control, not to remove the central reef/sandbar composition:
+  - `reef-core.glb`: main rock structure, ship/chest props, and baked hard-surface details.
+  - `seabed.glb`: restored sandbar, sand bowl, and low rubble.
+  - `vegetation.glb`: baked kelp/grass clusters plus optional supplements.
   - `background-rocks.glb`: low-detail silhouettes outside the swim volume.
 
 ### Kelp And Vegetation
 
-- Replace the current kelp with a more lifelike vegetation system:
-  - Use a small set of curved frond meshes with alpha-tested leaf cards or denser geometry.
+- Preserve the baked kelp and supplement it with a more lifelike vegetation system:
+  - Use a small set of additional curved frond meshes with alpha-tested leaf cards or denser geometry.
   - Add vertex-shader sway using per-instance phase and amplitude.
   - Vary height, color, width, bend, and leaf density per instance.
   - Place kelp in clusters instead of evenly around the reef.
-- If the current model's kelp remains, hide the weakest strips and supplement with new instanced fronds so the overall read improves without rebuilding the whole environment.
+- Avoid hiding the baked kelp wholesale. Hide only clearly broken pieces if necessary, and supplement with instanced fronds so the overall read improves without rebuilding the whole environment.
 
 ### Water And Atmosphere
 
@@ -163,8 +164,8 @@ Runtime fallback: if static icon generation is delayed, render thumbnails in a h
 
 ### Next Asset Work
 
-- Reprocess the environment into separate GLBs instead of one runtime-filtered file.
-- Keep a higher-quality reef core, but replace or supplement weak vegetation.
+- Reprocess the environment into separate GLBs only if needed for optimization or material control.
+- Keep the higher-quality baked reef/sandbar/kelp model as the baseline, and supplement weak vegetation only where the camera exposes it.
 - Generate static fish side-profile icons.
 - Add low-cost environment detail:
   - 12-24 instanced rubble rocks.
@@ -204,8 +205,8 @@ Runtime fallback: if static icon generation is delayed, render thumbnails in a h
 
 ### Phase 3: Environment Art Pass
 
-- Split or re-export environment layers.
-- Restore a controlled seabed instead of hiding all floor/sand meshes.
+- Restore the baked seabed instead of hiding all floor/sand meshes.
+- Split or re-export environment layers only if runtime control is not enough.
 - Add rubble/floating rock/debris instances.
 - Replace or supplement low-poly kelp with shader-sway fronds.
 
@@ -227,8 +228,8 @@ Runtime fallback: if static icon generation is delayed, render thumbnails in a h
 
 ## Acceptance Criteria For The Next Implementation
 
-- Reef appears grounded by sand/rubble/mist, not floating.
-- Kelp no longer reads as rigid low-poly ribbons in the primary camera views.
+- Reef appears grounded by the baked sandbar plus rubble/mist, not floating.
+- Baked kelp remains visible but is supported by lighting, particles, and optional supplemental fronds so it reads less rigid in primary camera views.
 - Fish can be selected visually by species thumbnail.
 - Follow mode clearly shows which fish/species is selected.
 - Auto-tour switches between visually clear targets and avoids reef-blocked shots.
@@ -238,7 +239,7 @@ Runtime fallback: if static icon generation is delayed, render thumbnails in a h
 
 ## Open Decisions
 
-- Whether to keep the current underwater environment as the long-term reef core or source a higher-fidelity reef/cliff model.
+- Keep the current underwater environment as the long-term central reef/sandbar baseline unless a later model is clearly better and license-compatible.
 - Whether goldfish/koi should remain in an ocean scene or be treated as stylized aquarium inhabitants.
-- Whether fish icons should be generated at build time, committed as static assets, or rendered once on first load and cached.
-- Whether the main scene should remain a cylindrical ocean slice or become a more natural bounded diorama with no visible cylinder concept.
+- Fish icons should start as committed static visual assets. A build-time renderer can replace them later if exact GLB thumbnails become necessary.
+- Keep the main scene as a cylindrical ocean slice.
