@@ -160,9 +160,14 @@ export function App() {
           ))}
         </div>
       </section>
-      <a className="credits-link" href="/credits">
-        Model credits
-      </a>
+      <nav className="site-links" aria-label="Site links">
+        <a className="site-link" href="https://alirezaafshan.com">
+          Portfolio
+        </a>
+        <a className="site-link" href="/credits">
+          Model credits
+        </a>
+      </nav>
     </main>
   );
 }
