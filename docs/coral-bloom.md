@@ -11,6 +11,12 @@ Coral Bloom replaces every previously bundled GLB with a code-native reef scene.
 
 The exact free asset IDs are recorded in `public/assets/manifest.json` so the external surface is easy to audit.
 
+## Asset zoo
+
+The separate `/zoo` route is a visual provenance audit. It normalizes each of the thirteen free Polyfork GLBs onto its own labeled pedestal, then presents the seven procedural creatures and five representative code-grown environment or shader families in a second pavilion. Cyan labels mean `free pack`; coral labels mean `generated`.
+
+The gallery uses orbit, zoom, and pan controls so each specimen can be inspected independently. Its reef-health slider drives the same shader uniform as the composed aquarium and makes the shared color-stress and caustic treatment visible across both asset sources.
+
 ## Scene-wide controls
 
 `reefHealth` is a value from 0 to 1. It is shared by every reef material. Lower values desaturate and stress the palette; higher values restore saturated coral colors and stronger caustic response. The HUD slider changes it live.

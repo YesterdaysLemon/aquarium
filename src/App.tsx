@@ -1,5 +1,6 @@
-import { Anchor, Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, Sprout, Waves } from 'lucide-react';
+import { Anchor, Boxes, Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, Sprout, Waves } from 'lucide-react';
 import { AquariumScene } from './components/AquariumScene';
+import { AssetZooPage } from './components/AssetZooPage';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { fishSpecies, fishSpeciesById, followableFishSpecies, normalizeSpeciesIndex, type SpeciesId } from './fishSpecies';
 
@@ -55,6 +56,10 @@ export function App() {
 
   if (route === '/credits') {
     return <CreditsPage />;
+  }
+
+  if (route === '/zoo') {
+    return <AssetZooPage />;
   }
 
   return (
@@ -175,9 +180,15 @@ export function App() {
           ))}
         </div>
       </section>
-      <a className="credits-link" href="/credits">
-        Reef notes
-      </a>
+      <nav className="footer-links" aria-label="More reef pages">
+        <a className="corner-link" href="/zoo">
+          <Boxes aria-hidden="true" />
+          Asset zoo
+        </a>
+        <a className="corner-link" href="/credits">
+          Reef notes
+        </a>
+      </nav>
     </main>
   );
 }
@@ -196,6 +207,9 @@ function CreditsPage() {
           procedural creatures, terrain, movement, and underwater shaders made
           directly for this aquarium.
         </p>
+        <div className="link-row credits-zoo-link">
+          <a href="/zoo">Explore the asset zoo</a>
+        </div>
         <article>
           <h2>Polyfork Coral Reef</h2>
           <p>

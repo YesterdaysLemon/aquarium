@@ -25,6 +25,8 @@ Every swimming creature, the reef terrain, and the underwater shaders are genera
 
 One scene-wide reef-health value drives the color stress response across both the procedural geometry and Polyfork props. The same material extension adds animated caustics to every reef surface.
 
+Open `/zoo` for an orbitable provenance playground. It displays each of the 13 free Polyfork specimens on a cyan pedestal and each generated creature or scene family on a warm pedestal, with a live reef-health shader control shared by both collections.
+
 ## Planning
 
 - [Coral Bloom implementation](docs/coral-bloom.md) records the asset boundary, procedural replacements, and visual validation targets.
