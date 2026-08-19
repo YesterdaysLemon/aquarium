@@ -1,75 +1,30 @@
 {
-  "fish": [
-    {
-      "id": "clownfish",
-      "name": "Clownfish",
-      "displayName": "Clownfish",
-      "path": "/assets/fish/Clownfish.glb",
-      "icon": "/assets/fish-icons/clownfish.svg",
-      "schooling": true,
-      "predator": false,
-      "followEligible": true
-    },
-    {
-      "id": "blueTang",
-      "name": "BlueTang",
-      "displayName": "Blue Tang",
-      "path": "/assets/fish/BlueTang.glb",
-      "icon": "/assets/fish-icons/blue-tang.svg",
-      "schooling": true,
-      "predator": false,
-      "followEligible": true
-    },
-    {
-      "id": "yellowTang",
-      "name": "YellowTang",
-      "displayName": "Yellow Tang",
-      "path": "/assets/fish/YellowTang.glb",
-      "icon": "/assets/fish-icons/yellow-tang.svg",
-      "schooling": true,
-      "predator": false,
-      "followEligible": true
-    },
-    {
-      "id": "goldfish",
-      "name": "Goldfish",
-      "displayName": "Goldfish",
-      "path": "/assets/fish/Goldfish.glb",
-      "icon": "/assets/fish-icons/goldfish.svg",
-      "schooling": false,
-      "predator": false,
-      "followEligible": true
-    },
-    {
-      "id": "koi",
-      "name": "Koi",
-      "displayName": "Koi",
-      "path": "/assets/fish/Koi.glb",
-      "icon": "/assets/fish-icons/koi.svg",
-      "schooling": false,
-      "predator": false,
-      "followEligible": true
-    },
-    {
-      "id": "puffer",
-      "name": "Puffer",
-      "displayName": "Puffer",
-      "path": "/assets/fish/Puffer.glb",
-      "icon": "/assets/fish-icons/puffer.svg",
-      "schooling": false,
-      "predator": false,
-      "followEligible": true
-    },
-    {
-      "id": "shark",
-      "name": "Shark",
-      "displayName": "Shark",
-      "path": "/assets/fish/Shark.glb",
-      "icon": "/assets/fish-icons/shark.svg",
-      "schooling": false,
-      "predator": true,
-      "followEligible": true
-    }
+  "scene": "Coral Bloom",
+  "modelStrategy": "Original procedural creatures and terrain with free Polyfork Coral Reef props",
+  "polyforkKit": "coral-reef-a7128a",
+  "polyforkCdn": "https://polyfork.dev/cdn",
+  "freePolyforkAssets": [
+    "admiralty-anchor-bd6882",
+    "broad-algae-frond-88a644",
+    "clay-amphora-098d94",
+    "rubble-scatter-decal-61332b",
+    "coral-rubble-seabed-tile-772a1f",
+    "dive-marker-buoy-21beb7",
+    "pillar-coral-b6deba",
+    "sea-urchin-b599d4",
+    "sea-whip-e56668",
+    "seagrass-tuft-862cc5",
+    "small-reef-rock-99062d",
+    "staghorn-coral-422d23",
+    "table-coral-193fa6"
   ],
-  "environment": "/assets/environment/underwater-environment.glb"
+  "proceduralCreatures": [
+    "emberFish",
+    "lagoonTang",
+    "sunfinTang",
+    "reefGrouper",
+    "moonJelly",
+    "seaTurtle",
+    "reefShark"
+  ]
 }

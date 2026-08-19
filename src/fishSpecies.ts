@@ -1,16 +1,15 @@
 export type SpeciesId =
-  | 'clownfish'
-  | 'blueTang'
-  | 'yellowTang'
-  | 'goldfish'
-  | 'koi'
-  | 'puffer'
-  | 'shark';
+  | 'emberFish'
+  | 'lagoonTang'
+  | 'sunfinTang'
+  | 'reefGrouper'
+  | 'moonJelly'
+  | 'seaTurtle'
+  | 'reefShark';
 
 export type FishSpecies = {
   id: SpeciesId;
   displayName: string;
-  model: string;
   icon: string;
   schooling: boolean;
   predator: boolean;
@@ -20,74 +19,67 @@ export type FishSpecies = {
 
 export const fishSpecies = [
   {
-    id: 'clownfish',
-    displayName: 'Clownfish',
-    model: '/assets/fish/Clownfish.glb',
-    icon: '/assets/fish-icons/clownfish.svg',
+    id: 'emberFish',
+    displayName: 'Ember Fish',
+    icon: '/assets/creature-icons/ember-fish.svg',
     schooling: true,
     predator: false,
     followEligible: true,
-    color: '#ff7b25',
+    color: '#ff9d7a',
   },
   {
-    id: 'blueTang',
-    displayName: 'Blue Tang',
-    model: '/assets/fish/BlueTang.glb',
-    icon: '/assets/fish-icons/blue-tang.svg',
+    id: 'lagoonTang',
+    displayName: 'Lagoon Tang',
+    icon: '/assets/creature-icons/lagoon-tang.svg',
     schooling: true,
     predator: false,
     followEligible: true,
-    color: '#2366ff',
+    color: '#4fb8a8',
   },
   {
-    id: 'yellowTang',
-    displayName: 'Yellow Tang',
-    model: '/assets/fish/YellowTang.glb',
-    icon: '/assets/fish-icons/yellow-tang.svg',
+    id: 'sunfinTang',
+    displayName: 'Sunfin Tang',
+    icon: '/assets/creature-icons/sunfin-tang.svg',
     schooling: true,
     predator: false,
     followEligible: true,
-    color: '#ffd22d',
+    color: '#ffd98c',
   },
   {
-    id: 'goldfish',
-    displayName: 'Goldfish',
-    model: '/assets/fish/Goldfish.glb',
-    icon: '/assets/fish-icons/goldfish.svg',
+    id: 'reefGrouper',
+    displayName: 'Reef Grouper',
+    icon: '/assets/creature-icons/reef-grouper.svg',
     schooling: false,
     predator: false,
     followEligible: true,
-    color: '#f2942e',
+    color: '#c079b0',
   },
   {
-    id: 'koi',
-    displayName: 'Koi',
-    model: '/assets/fish/Koi.glb',
-    icon: '/assets/fish-icons/koi.svg',
+    id: 'moonJelly',
+    displayName: 'Moon Jelly',
+    icon: '/assets/creature-icons/moon-jelly.svg',
     schooling: false,
     predator: false,
     followEligible: true,
-    color: '#f2efe0',
+    color: '#e0aecd',
   },
   {
-    id: 'puffer',
-    displayName: 'Puffer',
-    model: '/assets/fish/Puffer.glb',
-    icon: '/assets/fish-icons/puffer.svg',
+    id: 'seaTurtle',
+    displayName: 'Sea Turtle',
+    icon: '/assets/creature-icons/sea-turtle.svg',
     schooling: false,
     predator: false,
     followEligible: true,
-    color: '#d1bc67',
+    color: '#7c8f7a',
   },
   {
-    id: 'shark',
-    displayName: 'Shark',
-    model: '/assets/fish/Shark.glb',
-    icon: '/assets/fish-icons/shark.svg',
+    id: 'reefShark',
+    displayName: 'Reef Shark',
+    icon: '/assets/creature-icons/reef-shark.svg',
     schooling: false,
     predator: true,
     followEligible: true,
-    color: '#607680',
+    color: '#9aa3a6',
   },
 ] as const satisfies readonly FishSpecies[];
 

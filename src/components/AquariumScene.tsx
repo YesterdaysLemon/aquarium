@@ -1,15 +1,15 @@
 import { Html, OrbitControls, PerspectiveCamera, Stars } from '@react-three/drei';
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { CameraMode, Quality } from '../App';
 import { environmentColliders } from '../collision';
 import type { SpeciesId } from '../fishSpecies';
 import { BottomFog, LightRays } from './AtmosphereEffects';
 import { FishSchool, type FollowTarget } from './FishSchool';
+import { ReefEnvironment } from './ReefEnvironment';
+import { ReefShaderProvider } from './ReefShader';
 import { WaterEffects } from './WaterEffects';
 
 type Props = {
@@ -20,10 +20,8 @@ type Props = {
   cameraResetKey: number;
   followFishIndex: number;
   selectedSpecies: SpeciesId;
+  reefHealth: number;
 };
-
-const environmentPath = '/assets/environment/underwater-environment.glb';
-const hiddenEnvironmentMeshes = new Set(['Object1040']);
 
 export function AquariumScene({
   quality,
@@ -33,11 +31,20 @@ export function AquariumScene({
   cameraResetKey,
   followFishIndex,
   selectedSpecies,
+  reefHealth,
 }: Props) {
   const followTarget = useRef<FollowTarget>({
     position: new THREE.Vector3(0, 1, 15),
     velocity: new THREE.Vector3(1, 0, 0),
   });
+  const background = useMemo(
+    () => new THREE.Color('#071c25').lerp(new THREE.Color('#042c38'), reefHealth),
+    [reefHealth],
+  );
+  const fog = useMemo(
+    () => new THREE.Color('#183a3e').lerp(new THREE.Color('#0c5363'), reefHealth),
+    [reefHealth],
+  );
 
   return (
     <Canvas
@@ -46,9 +53,9 @@ export function AquariumScene({
       gl={{ antialias: quality === 'high', powerPreference: 'high-performance' }}
       shadows={quality === 'high'}
     >
-      <color attach="background" args={['#041c2c']} />
-      <fog attach="fog" args={['#08314a', 10, 64]} />
-      <PerspectiveCamera makeDefault position={[0, 12, 40]} fov={46} />
+      <color attach="background" args={[background]} />
+      <fog attach="fog" args={[fog, 11, 62]} />
+      <PerspectiveCamera makeDefault position={[0, 6, 34]} fov={46} />
       <CameraRig mode={cameraMode} resetKey={cameraResetKey} followTarget={followTarget} />
       <ambientLight intensity={0.9} color="#b4efff" />
       <hemisphereLight intensity={1.4} color="#dffcff" groundColor="#0d5361" />
@@ -69,24 +76,26 @@ export function AquariumScene({
         color="#d6fbff"
         distance={38}
       />
-      <Suspense fallback={<LoadingLabel />}>
-        <OceanVolume />
-        <LightRays />
-        <BottomFog />
-        <EnvironmentAnchor />
-        <FishSchool
-          quality={quality}
-          paused={paused}
-          showHitboxes={showHitboxes}
-          followTarget={followTarget}
-          followFishIndex={followFishIndex}
-          selectedSpecies={selectedSpecies}
-        />
-        {showHitboxes ? <EnvironmentHitboxes /> : null}
-        <MarineSnow quality={quality} paused={paused} />
-        <Bubbles quality={quality} paused={paused} />
-        <WaterEffects paused={paused} />
-      </Suspense>
+      <ReefShaderProvider health={reefHealth} paused={paused}>
+        <Suspense fallback={<LoadingLabel />}>
+          <OceanVolume />
+          <LightRays />
+          <BottomFog />
+          <ReefEnvironment />
+          <FishSchool
+            quality={quality}
+            paused={paused}
+            showHitboxes={showHitboxes}
+            followTarget={followTarget}
+            followFishIndex={followFishIndex}
+            selectedSpecies={selectedSpecies}
+          />
+          {showHitboxes ? <EnvironmentHitboxes /> : null}
+          <MarineSnow quality={quality} paused={paused} />
+          <Bubbles quality={quality} paused={paused} />
+          <WaterEffects paused={paused} />
+        </Suspense>
+      </ReefShaderProvider>
       {quality === 'high' ? <Stars radius={86} depth={24} count={520} factor={1.5} fade speed={0.25} /> : null}
     </Canvas>
   );
@@ -113,8 +122,8 @@ function CameraRig({
 
   useEffect(() => {
     if (mode === 'overview') {
-      camera.position.set(0, 12, 40);
-      controls.current?.target.set(0, 3, 0);
+      camera.position.set(0, 6, 34);
+      controls.current?.target.set(0, -1.8, 0);
       controls.current?.update();
     }
   }, [camera, mode, resetKey]);
@@ -172,7 +181,7 @@ function CameraRig({
       maxDistance={58}
       maxPolarAngle={Math.PI * 0.55}
       minPolarAngle={Math.PI * 0.17}
-      target={[0, 3, 0]}
+      target={[0, -1.8, 0]}
       makeDefault
     />
   );
@@ -181,53 +190,8 @@ function CameraRig({
 function LoadingLabel() {
   return (
     <Html center>
-      <div className="loader">Loading ocean slice</div>
+      <div className="loader">Growing the reef</div>
     </Html>
-  );
-}
-
-function EnvironmentAnchor() {
-  const gltf = useLoader(GLTFLoader, environmentPath, (loader) => {
-    loader.setMeshoptDecoder(MeshoptDecoder);
-  });
-
-  const scene = useMemo(() => {
-    const clone = gltf.scene.clone(true);
-    const box = new THREE.Box3().setFromObject(clone);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-    const maxAxis = Math.max(size.x, size.y, size.z);
-    const scale = maxAxis > 0 ? 42 / maxAxis : 1;
-    clone.scale.setScalar(scale);
-    clone.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
-    clone.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        if (hiddenEnvironmentMeshes.has(object.name)) {
-          object.visible = false;
-          return;
-        }
-
-        object.castShadow = true;
-        object.receiveShadow = true;
-        const materials = Array.isArray(object.material) ? object.material : [object.material];
-        for (const material of materials) {
-          if (material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial) {
-            material.emissive = new THREE.Color('#07323b');
-            material.emissiveIntensity = 0.08;
-            material.roughness = Math.min(1, material.roughness + 0.08);
-          }
-        }
-      }
-    });
-    return clone;
-  }, [gltf]);
-
-  return (
-    <group position={[0, -12.4, 0]} rotation={[0, -0.35, 0]}>
-      <primitive object={scene} />
-    </group>
   );
 }
 

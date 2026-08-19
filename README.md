@@ -6,7 +6,6 @@ A lightweight React Three Fiber aquarium designed for static hosting on a subdom
 
 ```powershell
 npm install
-npm run prepare-assets
 npm run dev
 ```
 
@@ -20,10 +19,12 @@ docker run --rm -p 8080:80 ocean-slice-aquarium
 
 Then open `http://localhost:8080`.
 
-## Assets
+## Reef system
 
-The app serves only optimized web assets from `public/assets`. Raw archives and source model formats stay in `models/` and are excluded from Docker builds.
+Every swimming creature, the reef terrain, and the underwater shaders are generated directly in Three.js. Thirteen free props from the [Polyfork Coral Reef kit](https://polyfork.dev/kit/coral-reef-a7128a) are loaded from Polyfork's public CDN at runtime; no paid or preview-only assets are copied into this repository.
+
+One scene-wide reef-health value drives the color stress response across both the procedural geometry and Polyfork props. The same material extension adds animated caustics to every reef surface.
 
 ## Planning
 
-- [Lifelike scene plan](docs/lifelike-scene-plan.md) tracks the current visual audit and the next implementation direction for scene realism, environment assets, fish selection, and camera flow.
+- [Coral Bloom implementation](docs/coral-bloom.md) records the asset boundary, procedural replacements, and visual validation targets.

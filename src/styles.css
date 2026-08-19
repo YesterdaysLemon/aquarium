@@ -122,9 +122,30 @@ a {
 }
 
 .icon-button svg,
-.back-link svg {
+.back-link svg,
+.health-control svg {
   width: 18px;
   height: 18px;
+}
+
+.health-control {
+  display: grid;
+  grid-template-columns: 18px auto 92px;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 7px;
+  color: #dffbd6;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.health-control input {
+  width: 92px;
+  accent-color: #7fd4c1;
+  cursor: ew-resize;
 }
 
 .fish-panel {
@@ -410,6 +431,24 @@ a {
   .controls {
     gap: 4px;
     padding: 4px;
+  }
+
+  .health-control {
+    grid-template-columns: 18px 72px;
+    gap: 5px;
+    padding: 0 5px;
+  }
+
+  .health-control span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .health-control input {
+    width: 72px;
   }
 
   .icon-button {
