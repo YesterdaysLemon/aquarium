@@ -5,8 +5,23 @@ import * as THREE from 'three';
 export function WaterEffects({ paused }: { paused: boolean }) {
   return (
     <group>
+      <WaterSurface paused={paused} />
       <CausticField paused={paused} />
     </group>
+  );
+}
+
+function WaterSurface({ paused }: { paused: boolean }) {
+  const material = useWaterSurfaceMaterial();
+
+  useFrame((_, delta) => {
+    if (!paused) material.uniforms.uTime.value += delta;
+  });
+
+  return (
+    <mesh position={[0, 11.5, 0]} rotation={[Math.PI / 2, 0, 0]} material={material} renderOrder={4}>
+      <circleGeometry args={[31, 128]} />
+    </mesh>
   );
 }
 
@@ -23,8 +38,8 @@ function CausticField({ paused }: { paused: boolean }) {
   });
 
   return (
-    <mesh position={[0, -7.15, 0]} rotation={[Math.PI / 2, 0, 0]} material={material} renderOrder={1}>
-      <circleGeometry args={[26, 160]} />
+    <mesh position={[0, -7.96, 0]} rotation={[Math.PI / 2, 0, 0]} material={material} renderOrder={2}>
+      <circleGeometry args={[29, 160]} />
     </mesh>
   );
 }
@@ -48,11 +63,11 @@ function useAnimatedWaterMaterial({
         },
         vertexShader: `
           varying vec2 vUv;
-          varying vec3 vLocalPosition;
+          varying vec3 vWorldPosition;
 
           void main() {
             vUv = uv;
-            vLocalPosition = position;
+            vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `,
@@ -61,7 +76,7 @@ function useAnimatedWaterMaterial({
           uniform float uOpacity;
           uniform float uTime;
           varying vec2 vUv;
-          varying vec3 vLocalPosition;
+          varying vec3 vWorldPosition;
 
           float linePattern(vec2 p, float speed, float angle) {
             mat2 r = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
@@ -74,7 +89,7 @@ function useAnimatedWaterMaterial({
             vec2 p = (vUv - 0.5) * 2.0;
             float radial = length(p);
             float edgeFade = 1.0 - smoothstep(0.36, 0.92, radial);
-            vec2 worldish = vLocalPosition.xz * 0.16;
+            vec2 worldish = vWorldPosition.xz * 0.16;
             float caustic =
               linePattern(worldish, 0.36, 0.35) *
               linePattern(worldish * 1.13 + 3.2, -0.22, -0.72);
@@ -91,5 +106,54 @@ function useAnimatedWaterMaterial({
         blending: THREE.AdditiveBlending,
       }),
     [color, depthTest, opacity],
+  );
+}
+
+function useWaterSurfaceMaterial() {
+  return useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uShallow: { value: new THREE.Color('#4fb8a8') },
+          uDeep: { value: new THREE.Color('#0d3347') },
+        },
+        vertexShader: `
+          uniform float uTime;
+          varying vec2 vUv;
+          varying float vWave;
+
+          void main() {
+            vUv = uv;
+            vec3 transformed = position;
+            float waveA = sin(position.x * 0.34 + uTime * 0.72) * 0.16;
+            float waveB = cos(position.y * 0.29 - uTime * 0.54) * 0.12;
+            transformed.z += waveA + waveB;
+            vWave = waveA + waveB;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uShallow;
+          uniform vec3 uDeep;
+          uniform float uTime;
+          varying vec2 vUv;
+          varying float vWave;
+
+          void main() {
+            float radial = length(vUv - 0.5) * 2.0;
+            float edge = smoothstep(0.25, 1.0, radial);
+            float glint = smoothstep(0.08, 0.28, vWave + sin((vUv.x + vUv.y) * 28.0 + uTime) * 0.035);
+            vec3 color = mix(uShallow, uDeep, edge * 0.62) + glint * vec3(0.2, 0.55, 0.58);
+            float alpha = mix(0.1, 0.42, edge) + glint * 0.08;
+            gl_FragColor = vec4(color, alpha);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.NormalBlending,
+      }),
+    [],
   );
 }

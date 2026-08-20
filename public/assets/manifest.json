@@ -1,75 +1,129 @@
 {
-  "fish": [
+  "scene": "Coral Bloom",
+  "modelStrategy": "Original procedural creatures and terrain with free Polyfork Coral Reef props plus a zoo-only anyCreature collection",
+  "polyforkKit": "coral-reef-a7128a",
+  "polyforkCdn": "https://polyfork.dev/cdn",
+  "freePolyforkAssets": [
+    "admiralty-anchor-bd6882",
+    "broad-algae-frond-88a644",
+    "clay-amphora-098d94",
+    "rubble-scatter-decal-61332b",
+    "coral-rubble-seabed-tile-772a1f",
+    "dive-marker-buoy-21beb7",
+    "pillar-coral-b6deba",
+    "sea-urchin-b599d4",
+    "sea-whip-e56668",
+    "seagrass-tuft-862cc5",
+    "small-reef-rock-99062d",
+    "staghorn-coral-422d23",
+    "table-coral-193fa6"
+  ],
+  "proceduralCreatures": [
+    "emberFish",
+    "lagoonTang",
+    "sunfinTang",
+    "reefGrouper",
+    "moonJelly",
+    "seaTurtle",
+    "reefShark"
+  ],
+  "generatedModelStudies": [
     {
-      "id": "clownfish",
-      "name": "Clownfish",
-      "displayName": "Clownfish",
-      "path": "/assets/fish/Clownfish.glb",
-      "icon": "/assets/fish-icons/clownfish.svg",
-      "schooling": true,
-      "predator": false,
-      "followEligible": true
+      "id": "reef-shark-v2",
+      "source": "generated from project-authored specification",
+      "generator": "Ariescar/anyCreature",
+      "generatorCommit": "ab5b1ce5c13e632f00f7f7cbfdb7a746e315000d",
+      "specification": "tools/anycreature/reef-shark-v2.json",
+      "asset": "assets/creatures/reef-shark-v2.glb",
+      "scope": "historical methodology study, not displayed"
     },
     {
-      "id": "blueTang",
-      "name": "BlueTang",
-      "displayName": "Blue Tang",
-      "path": "/assets/fish/BlueTang.glb",
-      "icon": "/assets/fish-icons/blue-tang.svg",
-      "schooling": true,
-      "predator": false,
-      "followEligible": true
+      "id": "ember-fish-v1",
+      "source": "generated from project-authored specification",
+      "generator": "Ariescar/anyCreature",
+      "generatorCommit": "ab5b1ce5c13e632f00f7f7cbfdb7a746e315000d",
+      "specification": "tools/anycreature/ember-fish-v1.json",
+      "asset": "assets/creatures/ember-fish-v1.glb",
+      "scope": "historical generic-fish methodology study, not displayed"
     },
     {
-      "id": "yellowTang",
-      "name": "YellowTang",
-      "displayName": "Yellow Tang",
-      "path": "/assets/fish/YellowTang.glb",
-      "icon": "/assets/fish-icons/yellow-tang.svg",
-      "schooling": true,
-      "predator": false,
-      "followEligible": true
+      "id": "lagoon-tang-v1",
+      "source": "generated from project-authored specification",
+      "generator": "Ariescar/anyCreature",
+      "generatorCommit": "ab5b1ce5c13e632f00f7f7cbfdb7a746e315000d",
+      "specification": "tools/anycreature/lagoon-tang-v1.json",
+      "asset": "assets/creatures/lagoon-tang-v1.glb",
+      "scope": "historical generic-fish methodology study, not displayed"
     },
     {
-      "id": "goldfish",
-      "name": "Goldfish",
-      "displayName": "Goldfish",
-      "path": "/assets/fish/Goldfish.glb",
-      "icon": "/assets/fish-icons/goldfish.svg",
-      "schooling": false,
-      "predator": false,
-      "followEligible": true
+      "id": "sunfin-tang-v1",
+      "source": "generated from project-authored specification",
+      "generator": "Ariescar/anyCreature",
+      "generatorCommit": "ab5b1ce5c13e632f00f7f7cbfdb7a746e315000d",
+      "specification": "tools/anycreature/sunfin-tang-v1.json",
+      "asset": "assets/creatures/sunfin-tang-v1.glb",
+      "scope": "historical generic-fish methodology study, not displayed"
     },
     {
-      "id": "koi",
-      "name": "Koi",
-      "displayName": "Koi",
-      "path": "/assets/fish/Koi.glb",
-      "icon": "/assets/fish-icons/koi.svg",
-      "schooling": false,
-      "predator": false,
-      "followEligible": true
+      "id": "reef-grouper-v1",
+      "source": "generated from project-authored specification",
+      "generator": "Ariescar/anyCreature",
+      "generatorCommit": "ab5b1ce5c13e632f00f7f7cbfdb7a746e315000d",
+      "specification": "tools/anycreature/reef-grouper-v1.json",
+      "asset": "assets/creatures/reef-grouper-v1.glb",
+      "scope": "historical generic-fish methodology study, not displayed"
     },
     {
-      "id": "puffer",
-      "name": "Puffer",
-      "displayName": "Puffer",
-      "path": "/assets/fish/Puffer.glb",
-      "icon": "/assets/fish-icons/puffer.svg",
-      "schooling": false,
-      "predator": false,
-      "followEligible": true
-    },
-    {
-      "id": "shark",
-      "name": "Shark",
-      "displayName": "Shark",
-      "path": "/assets/fish/Shark.glb",
-      "icon": "/assets/fish-icons/shark.svg",
-      "schooling": false,
-      "predator": true,
-      "followEligible": true
+      "id": "moon-jelly-v1",
+      "source": "generated from project-authored specification",
+      "generator": "Ariescar/anyCreature",
+      "generatorCommit": "ab5b1ce5c13e632f00f7f7cbfdb7a746e315000d",
+      "specification": "tools/anycreature/moon-jelly-v1.json",
+      "asset": "assets/creatures/moon-jelly-v1.glb",
+      "scope": "historical tall-bell methodology study, not displayed"
     }
   ],
-  "environment": "/assets/environment/underwater-environment.glb"
+  "anyCreatureCollection": [
+    {
+      "id": "ember-fish-v2",
+      "specification": "tools/anycreature/ember-fish-v2.json",
+      "asset": "assets/creatures/ember-fish-v2.glb"
+    },
+    {
+      "id": "lagoon-tang-v2",
+      "specification": "tools/anycreature/lagoon-tang-v2.json",
+      "asset": "assets/creatures/lagoon-tang-v2.glb"
+    },
+    {
+      "id": "sunfin-tang-v2",
+      "specification": "tools/anycreature/sunfin-tang-v2.json",
+      "asset": "assets/creatures/sunfin-tang-v2.glb"
+    },
+    {
+      "id": "reef-grouper-v2",
+      "specification": "tools/anycreature/reef-grouper-v2.json",
+      "asset": "assets/creatures/reef-grouper-v2.glb"
+    },
+    {
+      "id": "moon-jelly-v2",
+      "specification": "tools/anycreature/moon-jelly-v2.json",
+      "asset": "assets/creatures/moon-jelly-v2.glb"
+    },
+    {
+      "id": "sea-turtle-v1",
+      "specification": "tools/anycreature/sea-turtle-v1.json",
+      "asset": "assets/creatures/sea-turtle-v1.glb"
+    },
+    {
+      "id": "reef-shark-v3",
+      "specification": "tools/anycreature/reef-shark-v3.json",
+      "asset": "assets/creatures/reef-shark-v3.glb"
+    }
+  ],
+  "anyCreatureGenerator": {
+    "repository": "Ariescar/anyCreature",
+    "commit": "ab5b1ce5c13e632f00f7f7cbfdb7a746e315000d",
+    "license": "MIT",
+    "scope": "offline build tool, not vendored or shipped"
+  }
 }

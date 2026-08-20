@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Ember fish side profile">
+  <path fill="#ff9d7a" d="M28 39 8 20v39l20-16c10 18 36 24 72 8 9-4 17-9 24-14-11-13-29-22-51-22-21 0-37 9-45 24Z"/>
+  <path fill="#f7f2e4" d="M63 18h12v42H63z"/><path fill="#d94f4f" d="M89 19h9v36h-9z"/>
+  <circle cx="113" cy="31" r="4" fill="#0d3347"/><circle cx="114" cy="30" r="1.2" fill="#fff"/>
+</svg>

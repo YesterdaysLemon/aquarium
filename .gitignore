@@ -4,6 +4,8 @@ tmp/
 .codex/
 .vite/
 .cache/
+output/
+.playwright-cli/
 
 # Raw source model archives stay local; optimized web assets in public/assets are tracked.
 models/

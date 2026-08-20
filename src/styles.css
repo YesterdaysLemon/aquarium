@@ -59,9 +59,13 @@ a {
 .brand,
 .controls,
 .fish-panel,
-.credits-link,
+.corner-link,
 .back-link,
-.loader {
+.loader,
+.zoo-back-link,
+.zoo-title-card,
+.zoo-health-control,
+.zoo-help {
   background: rgba(3, 26, 38, 0.72);
   border: 1px solid rgba(170, 239, 255, 0.26);
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
@@ -111,7 +115,8 @@ a {
 
 .icon-button:hover,
 .fish-choice:hover,
-.credits-link:hover,
+.corner-link:hover,
+.zoo-back-link:hover,
 .back-link:hover {
   background: rgba(157, 239, 255, 0.18);
 }
@@ -122,9 +127,30 @@ a {
 }
 
 .icon-button svg,
-.back-link svg {
+.back-link svg,
+.health-control svg {
   width: 18px;
   height: 18px;
+}
+
+.health-control {
+  display: grid;
+  grid-template-columns: 18px auto 92px;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 7px;
+  color: #dffbd6;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.health-control input {
+  width: 92px;
+  accent-color: #7fd4c1;
+  cursor: ew-resize;
 }
 
 .fish-panel {
@@ -237,15 +263,29 @@ a {
   font-weight: 700;
 }
 
-.credits-link {
+.footer-links {
   position: absolute;
   right: 18px;
   bottom: 18px;
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.corner-link {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 7px;
   border-radius: 8px;
   padding: 10px 13px;
   color: #eefcff;
   text-decoration: none;
-  pointer-events: auto;
+}
+
+.corner-link svg {
+  width: 17px;
+  height: 17px;
 }
 
 .loader {
@@ -323,6 +363,259 @@ a {
   font-weight: 700;
 }
 
+.credits-zoo-link {
+  margin-bottom: 30px;
+}
+
+.zoo-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #061822;
+}
+
+.zoo-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.zoo-hud {
+  position: absolute;
+  inset: 18px 18px auto;
+  display: grid;
+  grid-template-columns: auto minmax(280px, 540px) auto;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.zoo-back-link,
+.zoo-health-control {
+  pointer-events: auto;
+}
+
+.zoo-back-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 0 13px;
+  color: #eefcff;
+  text-decoration: none;
+  font-weight: 750;
+}
+
+.zoo-back-link svg,
+.zoo-eyebrow svg,
+.zoo-health-control svg,
+.zoo-help svg {
+  width: 17px;
+  height: 17px;
+}
+
+.zoo-title-card {
+  padding: 14px 18px 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.zoo-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #a6f4ff;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.zoo-title-card h1 {
+  margin: 4px 0 3px;
+  font-size: clamp(1.65rem, 3vw, 2.55rem);
+  line-height: 1;
+}
+
+.zoo-title-card p {
+  margin: 0;
+  color: rgba(238, 252, 255, 0.72);
+  font-size: 0.8rem;
+}
+
+.zoo-fish-workshop {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  width: max-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  margin: 10px auto 0;
+  border-radius: 7px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: auto;
+}
+
+.zoo-fish-workshop > span {
+  padding: 0 6px;
+  color: rgba(238, 252, 255, 0.64);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.zoo-fish-workshop button {
+  min-height: 27px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 0 8px;
+  color: rgba(238, 252, 255, 0.76);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.zoo-fish-workshop button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.zoo-fish-workshop button[aria-pressed="true"] {
+  border-color: rgba(255, 146, 122, 0.72);
+  color: #fff7f5;
+  background: rgba(255, 146, 122, 0.18);
+  box-shadow: 0 0 18px rgba(255, 146, 122, 0.12);
+}
+
+.zoo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+  color: rgba(238, 252, 255, 0.86);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.zoo-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zoo-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #65e8f2;
+  box-shadow: 0 0 12px rgba(101, 232, 242, 0.8);
+}
+
+.zoo-legend .is-generated i {
+  background: #ff927a;
+  box-shadow: 0 0 12px rgba(255, 146, 122, 0.8);
+}
+
+.zoo-health-control {
+  display: grid;
+  grid-template-columns: 18px auto;
+  gap: 5px 8px;
+  min-width: 194px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #e6ffdd;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.zoo-health-control input {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: #72dac2;
+  cursor: ew-resize;
+}
+
+.zoo-help {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: rgba(238, 252, 255, 0.82);
+  font-size: 0.72rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.zoo-specimen-label {
+  display: grid;
+  width: 82px;
+  justify-items: center;
+  border: 1px solid rgba(101, 232, 242, 0.62);
+  border-radius: 6px;
+  padding: 4px 5px 5px;
+  color: #effeff;
+  background: rgba(2, 20, 28, 0.88);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  text-align: center;
+  pointer-events: none;
+}
+
+.zoo-specimen-label.is-generated {
+  border-color: rgba(255, 146, 122, 0.68);
+}
+
+.zoo-specimen-label span,
+.zoo-section-label span {
+  color: #74eef5;
+  font-size: 0.43rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.zoo-specimen-label.is-generated span {
+  color: #ffad9b;
+}
+
+.zoo-specimen-label strong {
+  margin-top: 2px;
+  font-size: 0.58rem;
+  line-height: 1.05;
+}
+
+.zoo-section-label {
+  display: grid;
+  min-width: 220px;
+  justify-items: center;
+  border-bottom: 2px solid var(--zoo-accent);
+  padding: 6px 12px 8px;
+  color: #f1fdff;
+  background: rgba(3, 23, 30, 0.9);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  pointer-events: none;
+}
+
+.zoo-section-label span {
+  color: var(--zoo-accent);
+}
+
+.zoo-section-label strong {
+  margin-top: 2px;
+  font-size: 1rem;
+}
+
 @media (max-width: 680px) {
   .hud {
     top: 12px;
@@ -347,7 +640,7 @@ a {
     clip: rect(0, 0, 0, 0);
   }
 
-  .credits-link {
+  .footer-links {
     right: 12px;
     bottom: 12px;
   }
@@ -404,12 +697,112 @@ a {
   .credits-panel {
     margin: 34px auto;
   }
+
+  .zoo-hud {
+    inset: 10px 10px auto;
+    grid-template-columns: auto 1fr;
+    gap: 8px;
+  }
+
+  .zoo-back-link {
+    min-height: 40px;
+    padding: 0 10px;
+  }
+
+  .zoo-back-link svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .zoo-title-card {
+    padding: 9px 10px 10px;
+    text-align: left;
+  }
+
+  .zoo-eyebrow {
+    justify-content: flex-start;
+    font-size: 0.58rem;
+  }
+
+  .zoo-title-card h1 {
+    margin-top: 3px;
+    font-size: 1.42rem;
+  }
+
+  .zoo-fish-workshop {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin: 7px 0 0;
+  }
+
+  .zoo-fish-workshop > span {
+    display: none;
+  }
+
+  .zoo-fish-workshop button {
+    padding: 0 7px;
+    font-size: 0.61rem;
+  }
+
+  .zoo-title-card p {
+    display: none;
+  }
+
+  .zoo-legend {
+    justify-content: flex-start;
+    gap: 5px 10px;
+    margin-top: 7px;
+    font-size: 0.64rem;
+  }
+
+  .zoo-health-control {
+    grid-column: 1 / -1;
+    grid-template-columns: 18px auto minmax(110px, 1fr);
+    gap: 7px;
+    min-width: 0;
+    padding: 7px 10px;
+  }
+
+  .zoo-health-control input {
+    grid-column: auto;
+  }
+
+  .zoo-help {
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .zoo-help span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
 }
 
 @media (max-width: 430px) {
   .controls {
     gap: 4px;
     padding: 4px;
+  }
+
+  .health-control {
+    grid-template-columns: 18px 72px;
+    gap: 5px;
+    padding: 0 5px;
+  }
+
+  .health-control span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .health-control input {
+    width: 72px;
   }
 
   .icon-button {
@@ -435,5 +828,15 @@ a {
   .icon-button svg {
     width: 17px;
     height: 17px;
+  }
+
+  .footer-links {
+    gap: 6px;
+  }
+
+  .corner-link {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 0.78rem;
   }
 }

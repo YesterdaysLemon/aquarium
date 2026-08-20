@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Sea turtle side profile">
+  <ellipse cx="79" cy="39" rx="39" ry="23" fill="#5f7a63"/><path fill="#7c8f7a" d="m52 24-31-13 20 27-27 11 32 3m59-26 27-8-17 20 31 8-35 7"/>
+  <path fill="#d9c295" d="M115 32c14-10 26-7 31 3-5 10-17 13-31 3Z"/>
+  <path fill="none" stroke="#42604f" stroke-width="3" d="M55 25 79 39 54 52m49-27L79 39l24 14"/>
+  <circle cx="138" cy="33" r="2.5" fill="#0d3347"/>
+</svg>

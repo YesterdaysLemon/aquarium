@@ -1,10 +1,10 @@
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { Quality } from '../App';
 import { environmentColliders, getColliderAvoidance } from '../collision';
 import { fishSpeciesById, type SpeciesId } from '../fishSpecies';
+import { ProceduralCreature } from './ProceduralCreature';
 
 type Props = {
   quality: Quality;
@@ -23,7 +23,6 @@ export type FollowTarget = {
 type Agent = {
   id: number;
   species: SpeciesId;
-  model: string;
   schooling: boolean;
   predator: boolean;
   position: THREE.Vector3;
@@ -48,50 +47,50 @@ type SpeciesConfig = {
 };
 
 const speciesConfigs: Record<SpeciesId, SpeciesConfig> = {
-  clownfish: {
-    scale: 0.58,
+  emberFish: {
+    scale: 0.82,
     hitRadiusScale: 0.58,
     baseSpeed: 1.18,
     speedVariation: 0.22,
     preferredRadius: 14.5,
   },
-  blueTang: {
-    scale: 0.62,
+  lagoonTang: {
+    scale: 0.86,
     hitRadiusScale: 0.56,
     baseSpeed: 1.28,
     speedVariation: 0.28,
     preferredRadius: 17,
   },
-  yellowTang: {
-    scale: 0.58,
+  sunfinTang: {
+    scale: 0.84,
     hitRadiusScale: 0.56,
     baseSpeed: 1.32,
     speedVariation: 0.3,
     preferredRadius: 19,
   },
-  goldfish: {
-    scale: 0.72,
+  reefGrouper: {
+    scale: 1.12,
     hitRadiusScale: 0.56,
     baseSpeed: 0.92,
     speedVariation: 0.26,
     preferredRadius: 13,
   },
-  koi: {
-    scale: 0.82,
+  moonJelly: {
+    scale: 0.94,
     hitRadiusScale: 0.56,
     baseSpeed: 0.86,
     speedVariation: 0.22,
     preferredRadius: 15,
   },
-  puffer: {
-    scale: 0.7,
+  seaTurtle: {
+    scale: 1.36,
     hitRadiusScale: 0.62,
     baseSpeed: 0.72,
     speedVariation: 0.2,
     preferredRadius: 12.5,
   },
-  shark: {
-    scale: 1.85,
+  reefShark: {
+    scale: 2.15,
     hitRadiusScale: 0.62,
     baseSpeed: 1.18,
     speedVariation: 0.2,
@@ -113,7 +112,7 @@ export function FishSchool({ quality, paused, showHitboxes, followTarget, follow
   return (
     <group>
       {agents.map((agent) => (
-        <FishAgent key={agent.id} agent={agent} showHitboxes={showHitboxes} />
+        <FishAgent key={agent.id} agent={agent} paused={paused} showHitboxes={showHitboxes} />
       ))}
     </group>
   );
@@ -148,47 +147,31 @@ function getFollowScore(agent: Agent) {
   return outerRing + clearHeight + schoolingBonus - predatorPenalty;
 }
 
-function FishAgent({ agent, showHitboxes }: { agent: Agent; showHitboxes: boolean }) {
+function FishAgent({ agent, paused, showHitboxes }: { agent: Agent; paused: boolean; showHitboxes: boolean }) {
   const group = useRef<THREE.Group>(null);
-  const gltf = useLoader(GLTFLoader, agent.model);
-  const object = useMemo(() => {
-    const clone = gltf.scene.clone(true);
-    const box = new THREE.Box3().setFromObject(clone);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-    const maxAxis = Math.max(size.x, size.y, size.z);
-    const normalizedScale = maxAxis > 0 ? agent.scale / maxAxis : agent.scale;
-    clone.scale.setScalar(normalizedScale);
-    clone.position.set(
-      -center.x * normalizedScale,
-      -center.y * normalizedScale,
-      -center.z * normalizedScale,
-    );
-    clone.traverse((node) => {
-      if (node instanceof THREE.Mesh) {
-        node.castShadow = true;
-      }
-    });
-    return clone;
-  }, [agent.scale, gltf]);
+  const lookTarget = useRef(new THREE.Vector3());
 
   useFrame(({ clock }) => {
     if (!group.current) return;
     group.current.position.copy(agent.position);
 
-    const lookTarget = agent.position.clone().add(agent.velocity);
-    group.current.lookAt(lookTarget);
-    group.current.rotateZ(
-      THREE.MathUtils.clamp(-agent.velocity.x * 0.08 + Math.sin(clock.elapsedTime * 3 + agent.phase) * 0.04, -0.35, 0.35),
-    );
-    object.rotation.y = Math.sin(clock.elapsedTime * 8 + agent.phase) * 0.035;
+    if (agent.species === 'moonJelly') {
+      group.current.rotation.set(0, Math.atan2(agent.velocity.x, agent.velocity.z), 0);
+    } else {
+      lookTarget.current.copy(agent.position).add(agent.velocity);
+      group.current.lookAt(lookTarget.current);
+      group.current.rotateZ(
+        THREE.MathUtils.clamp(-agent.velocity.x * 0.08 + Math.sin(clock.elapsedTime * 3 + agent.phase) * 0.04, -0.35, 0.35),
+      );
+      group.current.rotation.y += Math.sin(clock.elapsedTime * 7 + agent.phase) * 0.0015;
+    }
   });
 
   return (
     <group ref={group}>
-      <primitive object={object} />
+      <group scale={agent.scale}>
+        <ProceduralCreature paused={paused} phase={agent.phase} species={agent.species} />
+      </group>
       {showHitboxes ? (
         <mesh>
           <sphereGeometry args={[agent.hitRadius, 16, 10]} />
@@ -209,13 +192,13 @@ function createAgents(count: number): Agent[] {
   const species = createSpeciesRoster(count);
   const speciesSeen = new Map<SpeciesId, number>();
   const schoolAngles: Record<SpeciesId, number> = {
-    clownfish: -2.5,
-    blueTang: -0.6,
-    yellowTang: 1.15,
-    goldfish: 2.35,
-    koi: -1.55,
-    puffer: 0.45,
-    shark: 2.95,
+    emberFish: -2.5,
+    lagoonTang: -0.6,
+    sunfinTang: 1.15,
+    reefGrouper: 2.35,
+    moonJelly: -1.55,
+    seaTurtle: 0.45,
+    reefShark: 2.95,
   };
 
   return species.map((speciesId, index) => {
@@ -227,7 +210,7 @@ function createAgents(count: number): Agent[] {
       ? schoolAngles[speciesId] + (speciesIndex - 2) * 0.22 + Math.sin(index) * 0.08
       : schoolAngles[speciesId] + speciesIndex * 0.68 + index * 0.11;
     const orbitRadius = config.preferredRadius + ((index % 5) - 2) * 0.9;
-    const depth = -0.8 + (index % 7) * 1.15;
+    const depth = -3.7 + (index % 7) * 1.18;
     const position = new THREE.Vector3(
       Math.cos(angle) * orbitRadius,
       depth,
@@ -237,7 +220,6 @@ function createAgents(count: number): Agent[] {
     return {
       id: index,
       species: speciesId,
-      model: species.model,
       schooling: species.schooling,
       predator: species.predator,
       position,
@@ -257,51 +239,51 @@ function createAgents(count: number): Agent[] {
 
 function createSpeciesRoster(count: number): SpeciesId[] {
   const highRoster: SpeciesId[] = [
-    'clownfish',
-    'clownfish',
-    'clownfish',
-    'clownfish',
-    'clownfish',
-    'blueTang',
-    'blueTang',
-    'blueTang',
-    'blueTang',
-    'blueTang',
-    'yellowTang',
-    'yellowTang',
-    'yellowTang',
-    'yellowTang',
-    'goldfish',
-    'goldfish',
-    'goldfish',
-    'koi',
-    'koi',
-    'puffer',
-    'puffer',
-    'clownfish',
-    'blueTang',
-    'yellowTang',
-    'goldfish',
-    'koi',
-    'puffer',
-    'shark',
+    'emberFish',
+    'emberFish',
+    'emberFish',
+    'emberFish',
+    'emberFish',
+    'lagoonTang',
+    'lagoonTang',
+    'lagoonTang',
+    'lagoonTang',
+    'lagoonTang',
+    'sunfinTang',
+    'sunfinTang',
+    'sunfinTang',
+    'sunfinTang',
+    'reefGrouper',
+    'reefGrouper',
+    'reefGrouper',
+    'moonJelly',
+    'moonJelly',
+    'seaTurtle',
+    'seaTurtle',
+    'emberFish',
+    'lagoonTang',
+    'sunfinTang',
+    'reefGrouper',
+    'moonJelly',
+    'seaTurtle',
+    'reefShark',
   ];
 
   const lowRoster: SpeciesId[] = [
-    'clownfish',
-    'clownfish',
-    'clownfish',
-    'blueTang',
-    'blueTang',
-    'yellowTang',
-    'yellowTang',
-    'goldfish',
-    'goldfish',
-    'koi',
-    'puffer',
-    'clownfish',
-    'blueTang',
-    'shark',
+    'emberFish',
+    'emberFish',
+    'emberFish',
+    'lagoonTang',
+    'lagoonTang',
+    'sunfinTang',
+    'sunfinTang',
+    'reefGrouper',
+    'reefGrouper',
+    'moonJelly',
+    'seaTurtle',
+    'emberFish',
+    'lagoonTang',
+    'reefShark',
   ];
 
   return (count > lowRoster.length ? highRoster : lowRoster).slice(0, count);
@@ -432,7 +414,7 @@ function stepSchool(agents: Agent[], delta: number, time: number) {
       }
     }
 
-    agent.position.y = THREE.MathUtils.clamp(agent.position.y, -3, 9.5);
+    agent.position.y = THREE.MathUtils.clamp(agent.position.y, -4.7, 8.5);
   }
 
   for (let index = 0; index < agents.length; index += 1) {

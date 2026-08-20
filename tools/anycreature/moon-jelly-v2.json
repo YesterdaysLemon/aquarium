@@ -1,0 +1,243 @@
+{
+  "name": "moon_jelly_v2",
+  "style": "heavy",
+  "palette": {
+    "bell": { "color": "#b98aa9", "rough": 0.72 },
+    "gonad": { "color": "#8e617f", "rough": 0.76 },
+    "tentacle": { "color": "#d8cfbd", "rough": 0.86 }
+  },
+  "shading": {
+    "gradient": { "top": 0.42, "bottom": -0.7 },
+    "noise": { "size": 0.03, "amount": 0.1 }
+  },
+  "smooth_angle": 42,
+  "ao": true,
+  "joints": {
+    "BellTop": [0, 0.3, 0],
+    "BellCrown": { "from": "BellTop", "up": -0.12 },
+    "BellUpper": { "from": "BellCrown", "up": -0.14 },
+    "BellMid": { "from": "BellUpper", "up": -0.15 },
+    "BellLower": { "from": "BellMid", "up": -0.11 },
+    "BellRim": { "from": "BellLower", "up": -0.08 }
+  },
+  "chains": {
+    "bell": ["BellTop", "BellCrown", "BellUpper", "BellMid", "BellLower", "BellRim"]
+  },
+  "volumes": [
+    {
+      "chain": "bell",
+      "material": "bell",
+      "sides": 20,
+      "profile": [
+        [0, 0.38, 0.38],
+        [0.2, 0.46, 0.46],
+        [0.42, 0.56, 0.56],
+        [0.66, 0.67, 0.67],
+        [0.84, 0.75, 0.75, { "sharp": true }],
+        [1, 0.8, 0.8]
+      ],
+      "caps": ["dome", "none"],
+      "ring_step": 0.1,
+      "colors": {
+        "arcs": [
+          { "from": 0, "to": 38, "color": "#cfa5bf" },
+          { "from": 142, "to": 180, "color": "#8e698e" }
+        ]
+      }
+    }
+  ],
+  "parts": [
+    {
+      "name": "gonads_east_west",
+      "type": "eye",
+      "host": "BellTop",
+      "material": "gonad",
+      "forward": [0, 0, 1],
+      "face": 0,
+      "spread": 0.15,
+      "height": 0.02,
+      "size": 0.095
+    },
+    {
+      "name": "gonads_north_south",
+      "type": "eye",
+      "host": "BellTop",
+      "material": "gonad",
+      "forward": [1, 0, 0],
+      "face": 0,
+      "spread": 0.15,
+      "height": 0.02,
+      "size": 0.095
+    },
+    {
+      "name": "oral_arm_front",
+      "type": "curve",
+      "host": "BellUpper",
+      "material": "tentacle",
+      "offset": [0, -0.02, 0.14],
+      "dir": [0, -1, 0.06],
+      "segments": [
+        { "len": 0.14, "r": 0.045, "ahead": 5 },
+        { "len": 0.17, "r": 0.037, "behind": 9 },
+        { "len": 0.15, "r": 0.03, "ahead": 8, "taper": true }
+      ],
+      "sides": 7
+    },
+    {
+      "name": "oral_arm_back",
+      "type": "curve",
+      "host": "BellUpper",
+      "material": "tentacle",
+      "offset": [0, -0.02, -0.14],
+      "dir": [0, -1, -0.06],
+      "segments": [
+        { "len": 0.14, "r": 0.045, "behind": 5 },
+        { "len": 0.17, "r": 0.037, "ahead": 9 },
+        { "len": 0.15, "r": 0.03, "behind": 8, "taper": true }
+      ],
+      "sides": 7
+    },
+    {
+      "name": "oral_arm_left",
+      "type": "curve",
+      "host": "BellUpper",
+      "material": "tentacle",
+      "offset": [0.14, -0.02, 0],
+      "dir": [0.05, -1, 0],
+      "segments": [
+        { "len": 0.14, "r": 0.045, "ahead": 4 },
+        { "len": 0.17, "r": 0.037, "behind": 8 },
+        { "len": 0.15, "r": 0.03, "ahead": 7, "taper": true }
+      ],
+      "sides": 7
+    },
+    {
+      "name": "oral_arm_right",
+      "type": "curve",
+      "host": "BellUpper",
+      "material": "tentacle",
+      "offset": [-0.14, -0.02, 0],
+      "dir": [-0.05, -1, 0],
+      "segments": [
+        { "len": 0.14, "r": 0.045, "behind": 4 },
+        { "len": 0.17, "r": 0.037, "ahead": 8 },
+        { "len": 0.15, "r": 0.03, "behind": 7, "taper": true }
+      ],
+      "sides": 7
+    },
+    {
+      "name": "fringe_n",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [0, 0, 0.7],
+      "dir": [0, -1, 0.04],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "ahead": 8, "taper": true }],
+      "sides": 5
+    },
+    {
+      "name": "fringe_s",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [0, 0, -0.7],
+      "dir": [0, -1, -0.04],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "behind": 8, "taper": true }],
+      "sides": 5
+    },
+    {
+      "name": "fringe_e",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [0.7, 0, 0],
+      "dir": [0.04, -1, 0],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "ahead": 7, "taper": true }],
+      "sides": 5
+    },
+    {
+      "name": "fringe_w",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [-0.7, 0, 0],
+      "dir": [-0.04, -1, 0],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "behind": 7, "taper": true }],
+      "sides": 5
+    },
+    {
+      "name": "fringe_ne",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [0.5, 0, 0.5],
+      "dir": [0.03, -1, 0.03],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "ahead": 7, "taper": true }],
+      "sides": 5
+    },
+    {
+      "name": "fringe_nw",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [-0.5, 0, 0.5],
+      "dir": [-0.03, -1, 0.03],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "behind": 7, "taper": true }],
+      "sides": 5
+    },
+    {
+      "name": "fringe_se",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [0.5, 0, -0.5],
+      "dir": [0.03, -1, -0.03],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "ahead": 7, "taper": true }],
+      "sides": 5
+    },
+    {
+      "name": "fringe_sw",
+      "type": "curve",
+      "host": "BellRim",
+      "material": "tentacle",
+      "offset": [-0.5, 0, -0.5],
+      "dir": [-0.03, -1, -0.03],
+      "segments": [{ "len": 0.12, "r": 0.016 }, { "len": 0.11, "r": 0.012, "behind": 7, "taper": true }],
+      "sides": 5
+    }
+  ],
+  "animations": {
+    "idle": {
+      "duration": 3.1,
+      "loop": true,
+      "tracks": {
+        "BellUpper": { "ty": [[0, 0], [0.48, 0.015], [1, 0]] },
+        "BellMid": { "ty": [[0, 0], [0.48, 0.03], [1, 0]] },
+        "BellLower": { "ty": [[0, 0], [0.48, 0.045], [1, 0]] },
+        "BellRim": { "ty": [[0, 0], [0.48, 0.06], [0.7, 0.02], [1, 0]] },
+        "BellTop": { "rz": [[0, -1.2], [0.5, 1.2], [1, -1.2]] }
+      }
+    },
+    "pulse": {
+      "duration": 1.45,
+      "loop": true,
+      "tracks": {
+        "BellUpper": { "ty": [[0, 0], [0.38, 0.025], [0.62, 0.01], [1, 0]] },
+        "BellMid": { "ty": [[0, 0], [0.38, 0.055], [0.62, 0.025], [1, 0]] },
+        "BellLower": { "ty": [[0, 0], [0.38, 0.085], [0.62, 0.035], [1, 0]] },
+        "BellRim": { "ty": [[0, 0], [0.38, 0.12], [0.62, 0.05], [1, 0]] },
+        "BellTop": { "rz": [[0, -1.6], [0.5, 1.6], [1, -1.6]] }
+      }
+    },
+    "drift": {
+      "duration": 4.2,
+      "loop": true,
+      "tracks": {
+        "BellMid": { "ty": [[0, 0], [0.5, 0.012], [1, 0]] },
+        "BellLower": { "ty": [[0, 0], [0.5, 0.022], [1, 0]] },
+        "BellRim": { "ty": [[0, 0], [0.5, 0.035], [1, 0]] },
+        "BellTop": { "ry": [[0, -2.5], [0.5, 2.5], [1, -2.5]] }
+      }
+    }
+  }
+}

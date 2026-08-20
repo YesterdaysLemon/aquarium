@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Moon jelly side profile">
+  <path fill="#e0aecd" fill-opacity=".9" d="M48 40c0-22 14-35 32-35s32 13 32 35H48Z"/>
+  <path fill="none" stroke="#f7f2e4" stroke-width="4" stroke-linecap="round" d="M55 40c0 16 8 18 3 34M72 40c0 12-5 20-1 34M89 40c0 15 7 20 2 34M106 40c0 16-8 20-5 34"/>
+  <ellipse cx="80" cy="31" rx="18" ry="8" fill="#c079b0" fill-opacity=".6"/>
+</svg>

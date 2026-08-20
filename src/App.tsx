@@ -1,5 +1,6 @@
-import { Anchor, Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, Waves } from 'lucide-react';
+import { Anchor, Boxes, Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, Sprout, Waves } from 'lucide-react';
 import { AquariumScene } from './components/AquariumScene';
+import { AssetZooPage } from './components/AssetZooPage';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { fishSpecies, fishSpeciesById, followableFishSpecies, normalizeSpeciesIndex, type SpeciesId } from './fishSpecies';
 
@@ -8,12 +9,13 @@ export type CameraMode = 'overview' | 'follow';
 
 export function App() {
   const [paused, setPaused] = useState(false);
-  const [cameraMode, setCameraMode] = useState<CameraMode>('follow');
+  const [cameraMode, setCameraMode] = useState<CameraMode>('overview');
   const [cameraResetKey, setCameraResetKey] = useState(0);
   const [followFishIndex, setFollowFishIndex] = useState(0);
-  const [selectedSpecies, setSelectedSpecies] = useState<SpeciesId>('blueTang');
+  const [selectedSpecies, setSelectedSpecies] = useState<SpeciesId>('lagoonTang');
   const [autoFollow, setAutoFollow] = useState(true);
   const [autoTourStep, setAutoTourStep] = useState(0);
+  const [reefHealth, setReefHealth] = useState(0.88);
   const route = useMemo(() => window.location.pathname.replace(/\/+$/, '') || '/', []);
   const selectedSpeciesInfo = fishSpeciesById[selectedSpecies];
 
@@ -56,6 +58,10 @@ export function App() {
     return <CreditsPage />;
   }
 
+  if (route === '/zoo') {
+    return <AssetZooPage />;
+  }
+
   return (
     <main className="app-shell">
       <AquariumScene
@@ -66,13 +72,27 @@ export function App() {
         cameraResetKey={cameraResetKey}
         followFishIndex={followFishIndex}
         selectedSpecies={selectedSpecies}
+        reefHealth={reefHealth}
       />
       <section className="hud" aria-label="Aquarium controls">
         <div className="brand">
           <Waves aria-hidden="true" />
-          <span>Ocean Slice</span>
+          <span>Coral Bloom</span>
         </div>
         <div className="controls">
+          <label className="health-control">
+            <Sprout aria-hidden="true" />
+            <span>Reef {Math.round(reefHealth * 100)}%</span>
+            <input
+              aria-label="Reef health"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={reefHealth}
+              onChange={(event) => setReefHealth(Number(event.target.value))}
+            />
+          </label>
           <button
             type="button"
             className="icon-button"
@@ -160,9 +180,15 @@ export function App() {
           ))}
         </div>
       </section>
-      <a className="credits-link" href="/credits">
-        Model credits
-      </a>
+      <nav className="footer-links" aria-label="More reef pages">
+        <a className="corner-link" href="/zoo">
+          <Boxes aria-hidden="true" />
+          Asset zoo
+        </a>
+        <a className="corner-link" href="/credits">
+          Reef notes
+        </a>
+      </nav>
     </main>
   );
 }
@@ -175,33 +201,36 @@ function CreditsPage() {
         Aquarium
       </a>
       <section className="credits-panel">
-        <h1>Model Credits</h1>
+        <h1>Reef Notes</h1>
         <p>
-          This aquarium uses optimized web conversions of locally supplied model
-          files. Source archives and production web assets are kept separate.
+          Coral Bloom combines openly served Polyfork reef props with original
+          procedural creatures, terrain, movement, and underwater shaders made
+          directly for this aquarium.
         </p>
+        <div className="link-row credits-zoo-link">
+          <a href="/zoo">Explore the asset zoo</a>
+        </div>
         <article>
-          <h2>Animated Cute Fish Pack</h2>
+          <h2>Polyfork Coral Reef</h2>
           <p>
-            Models by Quaternius. Licensed under CC0 1.0 Universal / Public
-            Domain Dedication.
+            Thirteen free props from the Coral Reef kit are loaded from
+            Polyfork&apos;s public CDN. The scene uses the kit&apos;s shared scale and
+            palette while keeping paid meshes and preview files out of this repository.
           </p>
           <div className="link-row">
-            <a href="https://quaternius.com/packs/cutefish.html">Source</a>
-            <a href="https://creativecommons.org/publicdomain/zero/1.0/">License</a>
+            <a href="https://polyfork.dev/kit/coral-reef-a7128a">Kit</a>
+            <a href="https://polyfork.dev/licensing">License</a>
           </div>
         </article>
         <article>
-          <h2>Underwater Environment</h2>
+          <h2>Original scene system</h2>
           <p>
-            Model by Conrad Justin. Licensed under Creative Commons Attribution
-            4.0 International.
+            Every swimming creature, the reef arch, rock formations, branching
+            coral, sponge gardens, caustic projection, water surface, and global
+            reef-health response are code-native geometry and shaders in this app.
           </p>
           <div className="link-row">
-            <a href="https://sketchfab.com/3d-models/underwater-environment-eb5f5bdc58714e098e3d3ca12c15eb32">
-              Source
-            </a>
-            <a href="https://creativecommons.org/licenses/by/4.0/">License</a>
+            <a href="https://github.com/YesterdaysLemon/aquarium">Source</a>
           </div>
         </article>
       </section>

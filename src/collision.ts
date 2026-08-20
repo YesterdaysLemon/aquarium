@@ -18,40 +18,34 @@ export type EnvironmentCollider = SphereCollider | BoxCollider;
 
 export const environmentColliders: EnvironmentCollider[] = [
   {
-    id: 'main-cliff-core',
+    id: 'central-reef-core',
     kind: 'sphere',
-    center: new THREE.Vector3(0, 0.8, 0),
-    radius: 7.8,
+    center: new THREE.Vector3(0.2, -5.0, -4.6),
+    radius: 2.8,
   },
   {
-    id: 'left-column',
+    id: 'left-reef-tower',
     kind: 'sphere',
-    center: new THREE.Vector3(-5.4, -0.8, 1.2),
-    radius: 4.2,
+    center: new THREE.Vector3(-6.2, -4.8, 0.9),
+    radius: 3.2,
   },
   {
-    id: 'right-column',
+    id: 'right-reef-tower',
     kind: 'sphere',
-    center: new THREE.Vector3(5.2, -0.6, 1.1),
-    radius: 4.1,
+    center: new THREE.Vector3(5.6, -4.8, 1.2),
+    radius: 3.1,
   },
   {
-    id: 'top-stack',
-    kind: 'sphere',
-    center: new THREE.Vector3(0.8, 7.1, -0.4),
-    radius: 3.4,
-  },
-  {
-    id: 'arch-gap-guard',
+    id: 'arch-crown',
     kind: 'box',
-    center: new THREE.Vector3(0.3, 1.8, 0.6),
-    size: new THREE.Vector3(8.4, 3.8, 3.4),
+    center: new THREE.Vector3(-0.7, -2.9, 4.6),
+    size: new THREE.Vector3(8.2, 1.7, 2.4),
   },
   {
     id: 'reef-base',
     kind: 'box',
-    center: new THREE.Vector3(0, -4.8, 0),
-    size: new THREE.Vector3(18, 2.4, 12),
+    center: new THREE.Vector3(0, -7.2, 0),
+    size: new THREE.Vector3(19, 1.5, 14),
   },
 ];
 
