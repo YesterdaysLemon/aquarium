@@ -1,0 +1,168 @@
+{
+  "name": "reef_grouper_v1",
+  "style": "heavy",
+  "palette": {
+    "body": { "color": "#a86f92", "rough": 0.94 },
+    "fin": { "color": "#75547f", "rough": 0.96 },
+    "spot": { "color": "#d5bd77", "rough": 0.82 },
+    "eye": { "color": "#15171a", "rough": 0.28 }
+  },
+  "shading": {
+    "gradient": { "top": 0.28, "bottom": -0.34 },
+    "noise": { "size": 0.032, "amount": 0.18 }
+  },
+  "smooth_angle": 46,
+  "ao": true,
+  "joints": {
+    "Nose": [0, 0, 0.96],
+    "Head": { "from": "Nose", "fwd": -0.18 },
+    "Chest": { "from": "Head", "up": 0.01, "fwd": -0.29 },
+    "Belly": { "from": "Chest", "up": -0.01, "fwd": -0.38 },
+    "Rump": { "from": "Belly", "up": 0.015, "fwd": -0.34 },
+    "TailRoot": { "from": "Rump", "fwd": -0.24 },
+    "Tail2": { "from": "TailRoot", "up": 0.01, "fwd": -0.28 },
+    "TailTip": { "from": "Tail2", "up": 0.01, "fwd": -0.26 }
+  },
+  "chains": {
+    "body": ["Nose", "Head", "Chest", "Belly", "Rump", "TailRoot", "Tail2", "TailTip"]
+  },
+  "volumes": [
+    {
+      "chain": "body",
+      "material": "body",
+      "frame": "up",
+      "sides": 14,
+      "profile": [
+        [0, 0.24, 0.16],
+        [0.1, 0.4, 0.29],
+        [0.25, 0.55, 0.4],
+        [0.48, 0.62, 0.44, { "sharp": true }],
+        [0.67, 0.47, 0.32],
+        [0.78, 0.3, 0.21],
+        [0.88, 0.16, 0.11],
+        [0.96, 0.07, 0.05],
+        [1, 0.035, 0.028]
+      ],
+      "caps": ["dome", "dome"],
+      "ring_step": 0.15,
+      "colors": {
+        "arcs": [
+          { "from": 0, "to": 48, "color": "#704f78" },
+          { "from": 132, "to": 180, "color": "#c18aa6" }
+        ]
+      }
+    }
+  ],
+  "parts": [
+    {
+      "name": "dorsal_fin",
+      "type": "fin",
+      "host": "Belly",
+      "material": "fin",
+      "thickness": 0.03,
+      "conform": false,
+      "anchor": { "chain": "body", "t": 0.47, "around": 180 },
+      "udir": [0, 0, -1],
+      "vdir": [0, 1, 0],
+      "points": [[-0.22, 0], [0.28, 0.02], [0.16, 0.34], [-0.12, 0.48], [-0.32, 0.18]]
+    },
+    {
+      "name": "pectoral_fin",
+      "type": "fin",
+      "host": "Chest",
+      "material": "fin",
+      "thickness": 0.026,
+      "conform": false,
+      "anchor": { "chain": "body", "t": 0.34, "around": 78 },
+      "udir": [0, 0, -1],
+      "vdir": [1, -0.15, 0],
+      "points": [[-0.18, 0], [0.2, 0.02], [0.28, 0.2], [-0.02, 0.4], [-0.24, 0.14]],
+      "mirrored": true
+    },
+    {
+      "name": "tail_upper",
+      "type": "fin",
+      "host": "TailTip",
+      "material": "fin",
+      "thickness": 0.026,
+      "conform": false,
+      "offset": [0, 0, 0],
+      "udir": [0, 1, 0],
+      "vdir": [0, 0, -1],
+      "points": [[0, 0], [0.34, 0.04], [0.5, 0.25], [0.1, 0.2]]
+    },
+    {
+      "name": "tail_lower",
+      "type": "fin",
+      "host": "TailTip",
+      "material": "fin",
+      "thickness": 0.026,
+      "conform": false,
+      "offset": [0, 0, 0],
+      "udir": [0, 1, 0],
+      "vdir": [0, 0, -1],
+      "points": [[0, 0], [-0.1, 0.2], [-0.44, 0.23], [-0.31, 0.04]]
+    },
+    {
+      "type": "eye",
+      "host": "Head",
+      "material": "eye",
+      "size": 0.045,
+      "anchor": { "chain": "body", "t": 0.11, "around": 62 }
+    },
+    {
+      "name": "shoulder_spot",
+      "type": "eye",
+      "host": "Chest",
+      "material": "spot",
+      "size": 0.035,
+      "anchor": { "chain": "body", "t": 0.31, "around": 78 }
+    },
+    {
+      "name": "rump_spot",
+      "type": "eye",
+      "host": "Rump",
+      "material": "spot",
+      "size": 0.03,
+      "anchor": { "chain": "body", "t": 0.61, "around": 78 }
+    }
+  ],
+  "animations": {
+    "idle": {
+      "duration": 2.4,
+      "loop": true,
+      "tracks": {
+        "Chest": { "ry": [[0, 0.8], [0.5, -0.8], [1, 0.8]] },
+        "Belly": { "ry": [[0, 0], [0.25, 1.4], [0.5, 0], [0.75, -1.4], [1, 0]] },
+        "Rump": { "ry": [[0, -2], [0.5, 2], [1, -2]] },
+        "TailRoot": { "ry": [[0, 3], [0.5, -3], [1, 3]] },
+        "Tail2": { "ry": [[0, -5], [0.5, 5], [1, -5]] },
+        "TailTip": { "ry": [[0, 7], [0.5, -7], [1, 7]] }
+      }
+    },
+    "cruise": {
+      "duration": 1.05,
+      "loop": true,
+      "tracks": {
+        "Chest": { "ry": [[0, 1.2], [0.5, -1.2], [1, 1.2]] },
+        "Belly": { "ry": [[0, 0], [0.25, 2.2], [0.5, 0], [0.75, -2.2], [1, 0]] },
+        "Rump": { "ry": [[0, -3.2], [0.5, 3.2], [1, -3.2]] },
+        "TailRoot": { "ry": [[0, 5], [0.5, -5], [1, 5]] },
+        "Tail2": { "ry": [[0, -8], [0.5, 8], [1, -8]] },
+        "TailTip": { "ry": [[0, 12], [0.5, -12], [1, 12]] }
+      }
+    },
+    "burst": {
+      "duration": 0.55,
+      "loop": true,
+      "tracks": {
+        "Chest": { "ry": [[0, 2], [0.5, -2], [1, 2]] },
+        "Belly": { "ry": [[0, 0], [0.25, 3.5], [0.5, 0], [0.75, -3.5], [1, 0]] },
+        "Rump": { "ry": [[0, -5], [0.5, 5], [1, -5]] },
+        "TailRoot": { "ry": [[0, 8], [0.5, -8], [1, 8]] },
+        "Tail2": { "ry": [[0, -12], [0.5, 12], [1, -12]] },
+        "TailTip": { "ry": [[0, 18], [0.5, -18], [1, 18]] }
+      }
+    }
+  }
+}

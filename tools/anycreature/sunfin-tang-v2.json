@@ -1,0 +1,146 @@
+{
+  "name": "sunfin_tang_v2",
+  "palette": {
+    "body": { "color": "#d4b864", "rough": 0.92 },
+    "sun": { "color": "#bd6650", "rough": 0.94 },
+    "edge": { "color": "#814c4e", "rough": 0.95 },
+    "eye": { "color": "#11171a", "rough": 0.28 }
+  },
+  "shading": {
+    "gradient": { "top": 0.29, "bottom": -0.32 },
+    "noise": { "size": 0.03, "amount": 0.13 }
+  },
+  "smooth_angle": 47,
+  "ao": true,
+  "joints": {
+    "Nose": [0, -0.08, 0.7],
+    "Head": { "from": "Nose", "up": 0.075, "fwd": -0.15 },
+    "Chest": { "from": "Head", "up": 0.025, "fwd": -0.21 },
+    "Mid": { "from": "Chest", "fwd": -0.25 },
+    "Rump": { "from": "Mid", "up": -0.015, "fwd": -0.23 },
+    "TailRoot": { "from": "Rump", "fwd": -0.16 },
+    "TailTip": { "from": "TailRoot", "fwd": -0.18 }
+  },
+  "chains": {
+    "body": ["Nose", "Head", "Chest", "Mid", "Rump", "TailRoot", "TailTip"]
+  },
+  "volumes": [
+    {
+      "chain": "body",
+      "material": "body",
+      "frame": "up",
+      "sides": 14,
+      "profile": [
+        [0, 0.08, 0.14],
+        [0.1, 0.13, 0.23],
+        [0.29, 0.19, 0.4],
+        [0.52, 0.2, 0.49, { "sharp": true }],
+        [0.68, 0.18, 0.4],
+        [0.82, 0.13, 0.3],
+        [0.92, 0.085, 0.21],
+        [1, 0.06, 0.15]
+      ],
+      "caps": ["dome", "dome"],
+      "ring_step": 0.15,
+      "colors": {
+        "arcs": [
+          { "from": 132, "to": 180, "color": "#b97658" },
+          { "from": 0, "to": 30, "color": "#e1cb78" }
+        ]
+      }
+    }
+  ],
+  "parts": [
+    {
+      "name": "towering_dorsal_sail",
+      "type": "fin",
+      "host": "Mid",
+      "material": "sun",
+      "thickness": 0.029,
+      "conform": false,
+      "anchor": { "chain": "body", "t": 0.48, "around": 180 },
+      "udir": [0, 0, -1],
+      "vdir": [0, 1, 0],
+      "points": [[-0.42, -0.13], [0.37, -0.13], [0.29, 0.18], [0.08, 0.5], [-0.18, 0.55], [-0.39, 0.22]]
+    },
+    {
+      "name": "towering_anal_sail",
+      "type": "fin",
+      "host": "Mid",
+      "material": "edge",
+      "thickness": 0.027,
+      "conform": false,
+      "anchor": { "chain": "body", "t": 0.52, "around": 0 },
+      "udir": [0, 0, -1],
+      "vdir": [0, -1, 0],
+      "points": [[-0.36, -0.12], [0.34, -0.12], [0.27, 0.16], [0.04, 0.43], [-0.19, 0.46], [-0.37, 0.19]]
+    },
+    {
+      "name": "sailfin_pectoral",
+      "type": "fin",
+      "host": "Chest",
+      "material": "sun",
+      "thickness": 0.022,
+      "conform": false,
+      "anchor": { "chain": "body", "t": 0.29, "around": 78 },
+      "udir": [0, 0, -1],
+      "vdir": [1, -0.13, 0],
+      "points": [[-0.11, 0], [0.13, 0.01], [0.18, 0.12], [0, 0.27], [-0.17, 0.09]],
+      "mirrored": true
+    },
+    {
+      "name": "truncate_tail",
+      "type": "fin",
+      "host": "TailTip",
+      "material": "sun",
+      "thickness": 0.028,
+      "conform": false,
+      "offset": [0, 0, 0],
+      "udir": [0, 1, 0],
+      "vdir": [0, 0, -1],
+      "points": [[0, 0], [0.27, 0.08], [0.34, 0.34], [0.13, 0.41], [-0.13, 0.41], [-0.34, 0.34], [-0.27, 0.08]]
+    },
+    {
+      "type": "eye",
+      "host": "Head",
+      "material": "eye",
+      "size": 0.035,
+      "anchor": { "chain": "body", "t": 0.09, "around": 62 }
+    }
+  ],
+  "animations": {
+    "idle": {
+      "duration": 2.15,
+      "loop": true,
+      "tracks": {
+        "Chest": { "ry": [[0, 0.55], [0.5, -0.55], [1, 0.55]] },
+        "Mid": { "ry": [[0, 0], [0.25, 1.1], [0.5, 0], [0.75, -1.1], [1, 0]] },
+        "Rump": { "ry": [[0, -1.9], [0.5, 1.9], [1, -1.9]] },
+        "TailRoot": { "ry": [[0, 3.4], [0.5, -3.4], [1, 3.4]] },
+        "TailTip": { "ry": [[0, -5.8], [0.5, 5.8], [1, -5.8]] }
+      }
+    },
+    "cruise": {
+      "duration": 0.86,
+      "loop": true,
+      "tracks": {
+        "Chest": { "ry": [[0, 0.85], [0.5, -0.85], [1, 0.85]] },
+        "Mid": { "ry": [[0, 0], [0.25, 1.7], [0.5, 0], [0.75, -1.7], [1, 0]] },
+        "Rump": { "ry": [[0, -2.8], [0.5, 2.8], [1, -2.8]] },
+        "TailRoot": { "ry": [[0, 5], [0.5, -5], [1, 5]] },
+        "TailTip": { "ry": [[0, -8.5], [0.5, 8.5], [1, -8.5]] }
+      }
+    },
+    "burst": {
+      "duration": 0.46,
+      "loop": true,
+      "tracks": {
+        "Chest": { "ry": [[0, 1.3], [0.5, -1.3], [1, 1.3]] },
+        "Mid": { "ry": [[0, 0], [0.25, 2.5], [0.5, 0], [0.75, -2.5], [1, 0]] },
+        "Rump": { "ry": [[0, -4.2], [0.5, 4.2], [1, -4.2]] },
+        "TailRoot": { "ry": [[0, 7.4], [0.5, -7.4], [1, 7.4]] },
+        "TailTip": { "ry": [[0, -12.5], [0.5, 12.5], [1, -12.5]] }
+      }
+    }
+  }
+}

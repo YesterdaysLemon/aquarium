@@ -1,6 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import * as THREE from 'three';
+import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 export type ReefUniforms = {
   time: THREE.IUniform<number>;
@@ -57,7 +58,14 @@ export function decorateReefMaterial(material: THREE.Material, uniforms: ReefUni
 }
 
 export function cloneWithReefLook(root: THREE.Object3D, uniforms: ReefUniforms) {
-  const clone = root.clone(true);
+  return decorateClone(root.clone(true), uniforms);
+}
+
+export function cloneSkinnedWithReefLook(root: THREE.Object3D, uniforms: ReefUniforms) {
+  return decorateClone(cloneSkeleton(root), uniforms);
+}
+
+function decorateClone(clone: THREE.Object3D, uniforms: ReefUniforms) {
   clone.traverse((node) => {
     if (!(node instanceof THREE.Mesh)) return;
     node.castShadow = true;
@@ -123,8 +131,8 @@ function injectReefShader(shader: THREE.WebGLProgramParametersWithUniforms, unif
       varying vec3 vReefWorldPosition;`,
     )
     .replace(
-      '#include <begin_vertex>',
-      `#include <begin_vertex>
+      '#include <skinning_vertex>',
+      `#include <skinning_vertex>
       vReefWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;`,
     );
 

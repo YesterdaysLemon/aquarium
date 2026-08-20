@@ -5,7 +5,12 @@ import { Suspense, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { fishSpecies, type SpeciesId } from '../fishSpecies';
+import { AnyCreatureCollectionCreature } from './AnyCreatureModel';
 import { ProceduralCreature } from './ProceduralCreature';
+import {
+  PolyforkMethodCreature,
+  supportsPackMethod,
+} from './PolyforkMethodCreature';
 import {
   cloneWithReefLook,
   ReefMaterial,
@@ -16,6 +21,7 @@ import {
 const POLYFORK_CDN = 'https://polyfork.dev/cdn';
 
 type ExhibitSource = 'pack' | 'generated';
+type FishMethod = 'current' | 'pack' | 'anycreature';
 
 type PackExhibit = {
   asset: string;
@@ -52,10 +58,12 @@ const generatedPositions = Array.from({ length: 12 }, (_, index) => [
 
 export function AssetZooPage() {
   const [reefHealth, setReefHealth] = useState(0.88);
+  const [fishMethod, setFishMethod] = useState<FishMethod>('current');
+  const [fishFocus, setFishFocus] = useState(false);
 
   return (
     <main className="zoo-page">
-      <AssetZooScene reefHealth={reefHealth} />
+      <AssetZooScene fishFocus={fishFocus} fishMethod={fishMethod} reefHealth={reefHealth} />
       <header className="zoo-hud">
         <a className="zoo-back-link" href="/">
           <ArrowLeft aria-hidden="true" />
@@ -71,6 +79,46 @@ export function AssetZooPage() {
           <div className="zoo-legend" aria-label="Asset source legend">
             <span className="is-pack"><i aria-hidden="true" />13 free pack assets</span>
             <span className="is-generated"><i aria-hidden="true" />12 generated here</span>
+          </div>
+          <div className="zoo-fish-workshop" role="group" aria-label="Fish construction method">
+            <span>Fish workshop</span>
+            <button
+              type="button"
+              aria-pressed={fishMethod === 'current'}
+              onClick={() => {
+                setFishMethod('current');
+                setFishFocus(true);
+              }}
+            >
+              Current
+            </button>
+            <button
+              type="button"
+              aria-pressed={fishMethod === 'pack'}
+              onClick={() => {
+                setFishMethod('pack');
+                setFishFocus(true);
+              }}
+            >
+              Pack-method study
+            </button>
+            <button
+              type="button"
+              aria-pressed={fishMethod === 'anycreature'}
+              onClick={() => {
+                setFishMethod('anycreature');
+                setFishFocus(true);
+              }}
+            >
+              anyCreature collection
+            </button>
+            <button
+              type="button"
+              aria-pressed={!fishFocus}
+              onClick={() => setFishFocus(false)}
+            >
+              Overview
+            </button>
           </div>
         </section>
         <label className="zoo-health-control">
@@ -95,7 +143,15 @@ export function AssetZooPage() {
   );
 }
 
-function AssetZooScene({ reefHealth }: { reefHealth: number }) {
+function AssetZooScene({
+  fishFocus,
+  fishMethod,
+  reefHealth,
+}: {
+  fishFocus: boolean;
+  fishMethod: FishMethod;
+  reefHealth: number;
+}) {
   const background = useMemo(
     () => new THREE.Color('#061822').lerp(new THREE.Color('#0c3c47'), reefHealth),
     [reefHealth],
@@ -110,10 +166,16 @@ function AssetZooScene({ reefHealth }: { reefHealth: number }) {
     >
       <color attach="background" args={[background]} />
       <fog attach="fog" args={['#103c48', 30, 54]} />
-      <PerspectiveCamera makeDefault position={[0.7, 20, 28]} fov={47} />
-      <OrbitControls
+      <PerspectiveCamera
+        key={fishFocus ? 'fish-camera' : 'zoo-camera'}
         makeDefault
-        target={[0.7, 0.2, 0]}
+        position={fishFocus ? [9.2, 7.2, 13] : [0.7, 20, 28]}
+        fov={47}
+      />
+      <OrbitControls
+        key={fishFocus ? 'fish-controls' : 'zoo-controls'}
+        makeDefault
+        target={fishFocus ? [9.2, 0.8, -2] : [0.7, 0.2, 0]}
         enableDamping
         dampingFactor={0.07}
         minDistance={7}
@@ -156,12 +218,36 @@ function AssetZooScene({ reefHealth }: { reefHealth: number }) {
           {fishSpecies.map((species, index) => (
             <Exhibit
               key={species.id}
-              name={species.displayName}
+              name={
+                fishMethod === 'anycreature'
+                  ? `${species.displayName} · anyCreature`
+                  : species.displayName
+              }
               position={generatedPositions[index]}
               source="generated"
             >
-              <group position={[0, 1.05, 0]} rotation={[0, 0, 0]} scale={1.22}>
-                <ProceduralCreature paused={false} phase={index * 0.8} species={species.id as SpeciesId} />
+              <group
+                position={[0, 1.05, 0]}
+                rotation={[0, fishMethod === 'anycreature' ? Math.PI / 2 + (index % 2 ? -0.12 : 0.12) : 0, 0]}
+                scale={1.22}
+              >
+                {fishMethod === 'anycreature' ? (
+                  <AnyCreatureCollectionCreature
+                    health={reefHealth}
+                    paused={false}
+                    phase={index * 0.8}
+                    species={species.id}
+                  />
+                ) : fishMethod === 'pack' && supportsPackMethod(species.id) ? (
+                  <PolyforkMethodCreature
+                    health={reefHealth}
+                    paused={false}
+                    phase={index * 0.8}
+                    species={species.id}
+                  />
+                ) : (
+                  <ProceduralCreature paused={false} phase={index * 0.8} species={species.id as SpeciesId} />
+                )}
               </group>
             </Exhibit>
           ))}
