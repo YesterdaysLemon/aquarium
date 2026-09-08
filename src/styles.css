@@ -187,12 +187,16 @@ a {
 }
 
 .fish-picker {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(64px, 1fr));
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #427082 transparent;
+  padding-bottom: 5px;
   gap: 8px;
 }
 
 .fish-choice {
+  flex: 0 0 78px;
   position: relative;
   display: grid;
   grid-template-rows: 42px auto;
@@ -238,9 +242,6 @@ a {
 }
 
 .credits-link {
-  position: absolute;
-  right: 18px;
-  bottom: 18px;
   border-radius: 8px;
   padding: 10px 13px;
   color: #eefcff;
@@ -256,13 +257,20 @@ a {
 }
 
 .credits-page {
-  min-height: 100%;
+  height: 100%;
   overflow: auto;
   padding: 28px;
   background:
     radial-gradient(circle at 50% 10%, rgba(67, 207, 228, 0.22), transparent 32rem),
     linear-gradient(180deg, #04131d 0%, #08263a 52%, #071923 100%);
 }
+
+.zoom-level { min-width: 40px; text-align: center; color: #bce6e5; font-size: 12px; font-variant-numeric: tabular-nums; }
+.icon-button:disabled { opacity: .35; cursor: default; }
+.camera-hint { position: absolute; bottom: 65px; right: 18px; margin: 0; color: #c0dedb; font-size: 11px; pointer-events: none; text-shadow: 0 1px 4px #00141f; }
+@media (max-width: 680px) { .camera-hint { left: 14px; bottom: 24px; right: auto; max-width: 180px; font-size: 10px; } .zoom-level { min-width: 35px; font-size: 11px; } }
+
+button:focus-visible, a:focus-visible { outline: 2px solid #b3f9ec; outline-offset: 3px; }
 
 .back-link {
   display: inline-flex;
@@ -339,7 +347,7 @@ a {
     padding: 0;
   }
 
-  .brand span {
+  .brand h1 {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -436,4 +444,16 @@ a {
     width: 17px;
     height: 17px;
   }
+}
+
+.brand h1 { margin: 0; font-size: 1rem; }
+.loading-intro { padding: 8vh 24px; max-width: 650px; margin: auto; }
+.loading-intro a, .credits-panel p a { color: #9ff0ff; }
+.site-links { position: fixed; right: 18px; bottom: 18px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 2; }
+.creator-link { color: #d2f3ef; font-size: 12px; text-underline-offset: 3px; text-shadow: 0 1px 5px #00141f; }
+.camera-hint { bottom: 100px; }
+.credits-page { padding-bottom: 110px; }
+@media (max-width: 680px) {
+  .camera-hint { bottom: 224px; max-width: none; }
+  .site-links { left: 14px; right: 12px; bottom: 12px; flex-direction: row; justify-content: space-between; align-items: center; }
 }

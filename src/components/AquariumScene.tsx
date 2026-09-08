@@ -1,4 +1,4 @@
-import { Html, OrbitControls, PerspectiveCamera, Stars } from '@react-three/drei';
+import { Html, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
@@ -11,6 +11,7 @@ import type { SpeciesId } from '../fishSpecies';
 import { BottomFog, LightRays } from './AtmosphereEffects';
 import { FishSchool, type FollowTarget } from './FishSchool';
 import { WaterEffects } from './WaterEffects';
+import { swayKelp, underwaterMaterial } from '../underwaterShading';
 
 type Props = {
   quality: Quality;
@@ -20,6 +21,8 @@ type Props = {
   cameraResetKey: number;
   followFishIndex: number;
   selectedSpecies: SpeciesId;
+  zoom: number;
+  onZoomChange: (factor: number) => void;
 };
 
 const environmentPath = '/assets/environment/underwater-environment.glb';
@@ -33,6 +36,8 @@ export function AquariumScene({
   cameraResetKey,
   followFishIndex,
   selectedSpecies,
+  zoom,
+  onZoomChange,
 }: Props) {
   const followTarget = useRef<FollowTarget>({
     position: new THREE.Vector3(0, 1, 15),
@@ -43,21 +48,30 @@ export function AquariumScene({
     <Canvas
       className="aquarium-canvas"
       dpr={quality === 'high' ? [1, 1.5] : [0.75, 1]}
-      gl={{ antialias: quality === 'high', powerPreference: 'high-performance' }}
+      gl={{ antialias: quality === 'high', powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.12 }}
       shadows={quality === 'high'}
     >
       <color attach="background" args={['#041c2c']} />
-      <fog attach="fog" args={['#08314a', 10, 64]} />
+      <fog attach="fog" args={['#08314a', 16, 76]} />
       <PerspectiveCamera makeDefault position={[0, 12, 40]} fov={46} />
-      <CameraRig mode={cameraMode} resetKey={cameraResetKey} followTarget={followTarget} />
-      <ambientLight intensity={0.9} color="#b4efff" />
-      <hemisphereLight intensity={1.4} color="#dffcff" groundColor="#0d5361" />
+      <CameraRig mode={cameraMode} resetKey={cameraResetKey} followTarget={followTarget} zoom={zoom} onZoomChange={onZoomChange} />
+      <ambientLight intensity={0.32} color="#9acbd9" />
+      <hemisphereLight intensity={1.65} color="#d5f3ef" groundColor="#173942" />
       <directionalLight
         position={[-10, 18, -12]}
-        intensity={3.7}
-        color="#d6fbff"
+        intensity={3.4}
+        color="#fff0cd"
         castShadow={quality === 'high'}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-30}
+        shadow-camera-right={30}
+        shadow-camera-top={26}
+        shadow-camera-bottom={-24}
+        shadow-camera-far={85}
+        shadow-normalBias={0.06}
+        shadow-bias={-0.0002}
       />
+      <directionalLight position={[12, 8, 20]} intensity={1.2} color="#8dcfdf" />
       <pointLight position={[8, 6, -10]} intensity={7} color="#31b7d7" distance={38} />
       <pointLight position={[-6, 2, 7]} intensity={3.5} color="#79efcf" distance={22} />
       <spotLight
@@ -71,7 +85,7 @@ export function AquariumScene({
       />
       <Suspense fallback={<LoadingLabel />}>
         <OceanVolume />
-        <LightRays />
+        <LightRays paused={paused} quality={quality} />
         <BottomFog />
         <EnvironmentAnchor />
         <FishSchool
@@ -87,7 +101,6 @@ export function AquariumScene({
         <Bubbles quality={quality} paused={paused} />
         <WaterEffects paused={paused} />
       </Suspense>
-      {quality === 'high' ? <Stars radius={86} depth={24} count={520} factor={1.5} fade speed={0.25} /> : null}
     </Canvas>
   );
 }
@@ -96,13 +109,17 @@ function CameraRig({
   mode,
   resetKey,
   followTarget,
+  zoom,
+  onZoomChange,
 }: {
   mode: CameraMode;
   resetKey: number;
   followTarget: RefObject<FollowTarget>;
+  zoom: number;
+  onZoomChange: (factor: number) => void;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
   const desiredPosition = useRef(new THREE.Vector3());
   const desiredLookAt = useRef(new THREE.Vector3());
   const forward = useRef(new THREE.Vector3());
@@ -110,6 +127,38 @@ function CameraRig({
   const lateral = useRef(new THREE.Vector3());
   const up = useRef(new THREE.Vector3(0, 1, 0));
   const followLookOffset = useRef(new THREE.Vector3(0, 0.22, 0));
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    canvas.tabIndex = 0;
+    canvas.setAttribute('aria-label', 'Aquarium view. Scroll, pinch, or use plus and minus to zoom.');
+    const pointers = new Map<number, { x: number; y: number }>();
+    let pinchDistance = 0;
+    const distance = () => { const points = [...pointers.values()]; return points.length === 2 ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) : 0; };
+    const down = (event: PointerEvent) => { pointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); pinchDistance = distance(); };
+    const move = (event: PointerEvent) => {
+      if (!pointers.has(event.pointerId)) return;
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      const next = distance();
+      if (next > 8 && pinchDistance > 8) onZoomChange(next / pinchDistance);
+      pinchDistance = next;
+    };
+    const up = (event: PointerEvent) => { pointers.delete(event.pointerId); pinchDistance = distance(); };
+    const wheel = (event: WheelEvent) => { event.preventDefault(); onZoomChange(Math.exp(-Math.max(-180, Math.min(180, event.deltaY * (event.deltaMode === 1 ? 16 : 1))) * .002)); };
+    const key = (event: KeyboardEvent) => {
+      if (['+', '=', '-', '_'].includes(event.key)) { event.preventDefault(); onZoomChange(event.key === '+' || event.key === '=' ? 1.2 : 1 / 1.2); }
+    };
+    canvas.addEventListener('wheel', wheel, { passive: false });
+    canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointermove', move);
+    canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('lostpointercapture', up); canvas.addEventListener('keydown', key);
+    return () => {
+      canvas.removeEventListener('wheel', wheel); canvas.removeEventListener('pointerdown', down);
+      canvas.removeEventListener('pointermove', move); canvas.removeEventListener('pointerup', up);
+      canvas.removeEventListener('pointercancel', up); canvas.removeEventListener('lostpointercapture', up);
+      canvas.removeEventListener('keydown', key);
+    };
+  }, [gl, onZoomChange]);
 
   useEffect(() => {
     if (mode === 'overview') {
@@ -120,6 +169,11 @@ function CameraRig({
   }, [camera, mode, resetKey]);
 
   useFrame((_, delta) => {
+    if (camera instanceof THREE.PerspectiveCamera && camera.zoom !== zoom) {
+      camera.zoom = THREE.MathUtils.lerp(camera.zoom, zoom, 1 - Math.exp(-Math.min(delta, .1) * 12));
+      if (Math.abs(camera.zoom - zoom) < .0001) camera.zoom = zoom;
+      camera.updateProjectionMatrix();
+    }
     if (mode !== 'follow' || !followTarget.current) return;
 
     const target = followTarget.current;
@@ -142,15 +196,15 @@ function CameraRig({
     lateral.current.normalize();
 
     const targetRadius = Math.max(Math.hypot(target.position.x, target.position.z), 0.001);
-    const cameraRadius = Math.max(targetRadius + 13, 30);
+    const cameraRadius = Math.max(targetRadius + 7.5 + (target.size ?? 1) * 1.3, 23);
     desiredPosition.current
       .set(outward.current.x * cameraRadius, target.position.y + 1.2, outward.current.z * cameraRadius)
       .addScaledVector(lateral.current, -1.8);
 
     const constrainedRadius = Math.max(Math.hypot(desiredPosition.current.x, desiredPosition.current.z), 0.001);
-    if (constrainedRadius < 30) {
-      desiredPosition.current.x = (desiredPosition.current.x / constrainedRadius) * 30;
-      desiredPosition.current.z = (desiredPosition.current.z / constrainedRadius) * 30;
+    if (constrainedRadius < 23) {
+      desiredPosition.current.x = (desiredPosition.current.x / constrainedRadius) * 23;
+      desiredPosition.current.z = (desiredPosition.current.z / constrainedRadius) * 23;
     }
 
     desiredLookAt.current
@@ -166,6 +220,8 @@ function CameraRig({
     <OrbitControls
       ref={controls}
       enabled={mode === 'overview'}
+      enableZoom={false}
+      enablePan={false}
       enableDamping
       dampingFactor={0.08}
       minDistance={18}
@@ -211,18 +267,33 @@ function EnvironmentAnchor() {
 
         object.castShadow = true;
         object.receiveShadow = true;
+        object.material = Array.isArray(object.material) ? object.material.map(m => m.clone()) : object.material.clone();
         const materials = Array.isArray(object.material) ? object.material : [object.material];
         for (const material of materials) {
           if (material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial) {
             material.emissive = new THREE.Color('#07323b');
             material.emissiveIntensity = 0.08;
             material.roughness = Math.min(1, material.roughness + 0.08);
+            if (object.name === 'Object1035') swayKelp(material);
+            underwaterMaterial(material);
           }
+        }
+        if (object.name === 'Object1035') {
+          object.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side: THREE.DoubleSide });
+          swayKelp(object.customDepthMaterial);
         }
       }
     });
     return clone;
   }, [gltf]);
+
+  useEffect(() => () => scene.traverse(object => {
+    if (object instanceof THREE.Mesh) {
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      materials.forEach(material => material.dispose());
+      object.customDepthMaterial?.dispose();
+    }
+  }), [scene]);
 
   return (
     <group position={[0, -12.4, 0]} rotation={[0, -0.35, 0]}>

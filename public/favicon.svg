@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs><linearGradient id="ocean" x2=".3" y2="1"><stop stop-color="#16495d"/><stop offset="1" stop-color="#041d30"/></linearGradient><linearGradient id="fish" x2=".7" y2="1"><stop stop-color="#ffe3a0"/><stop offset="1" stop-color="#f3ad59"/></linearGradient></defs>
+  <rect width="128" height="128" rx="28" fill="url(#ocean)"/>
+  <circle cx="64" cy="64" r="46" fill="none" stroke="#7bdcd5" stroke-width="5"/>
+  <path d="M29 63c15-23 39-25 56 0-16 24-41 22-56 0Z" fill="url(#fish)"/>
+  <path d="m80 63 22-18-4 18 4 18Z" fill="#f6bd70"/>
+  <circle cx="42" cy="59" r="4" fill="#08273a"/>
+  <path d="M40 89q12-8 24 0t24 0" fill="none" stroke="#78d6d0" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="79" cy="35" r="4" fill="#b4eee4"/>
+</svg>

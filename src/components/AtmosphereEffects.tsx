@@ -1,6 +1,8 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import type { Quality } from '../App';
+import { oceanTime } from '../underwaterShading';
 
 type VolumeMode = 'mist' | 'ray';
 
@@ -57,7 +59,7 @@ export function BottomFog() {
   );
 }
 
-export function LightRays() {
+export function LightRays({ quality }: { paused: boolean; quality: Quality }) {
   const rays = useMemo(
     () => [
       { position: [-10.8, 3.25, -14.3], scale: [3.7, 31, 3.7], opacity: 0.18, seed: 0.12 },
@@ -72,7 +74,7 @@ export function LightRays() {
 
   return (
     <group>
-      {rays.map((ray, index) => (
+      {rays.slice(0, quality === 'high' ? 5 : 2).map((ray, index) => (
         <RaymarchedVolume
           key={index}
           blending={THREE.AdditiveBlending}
@@ -112,6 +114,7 @@ function RaymarchedVolume({
     opacity,
     seed,
   });
+  useEffect(() => () => material.dispose(), [material]);
 
   useFrame(() => {
     if (!mesh.current) return;
@@ -155,6 +158,7 @@ function useRaymarchedVolumeMaterial({
           uMode: { value: mode === 'mist' ? 0 : 1 },
           uOpacity: { value: opacity },
           uSeed: { value: seed },
+          uTime: oceanTime,
         },
         vertexShader: `
           varying vec3 vLocalPosition;
@@ -169,6 +173,7 @@ function useRaymarchedVolumeMaterial({
           uniform vec3 uColor;
           uniform float uOpacity;
           uniform float uSeed;
+          uniform float uTime;
           uniform int uMode;
           varying vec3 vLocalPosition;
 
@@ -234,7 +239,7 @@ function useRaymarchedVolumeMaterial({
           float fbm(vec3 p) {
             float value = 0.0;
             float amp = 0.5;
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 3; i++) {
               value += noise(p) * amp;
               p *= 2.04;
               amp *= 0.5;
@@ -259,7 +264,7 @@ function useRaymarchedVolumeMaterial({
             float radial = length(p.xz);
             float core = 1.0 - smoothstep(0.34, 0.94, radial);
             float vertical = smoothstep(0.03, 0.18, h) * (1.0 - smoothstep(0.78, 1.0, h));
-            float grain = fbm(p * vec3(4.8, 5.2, 4.8) + vec3(uSeed));
+            float grain = fbm(p * vec3(4.8, 5.2, 4.8) + vec3(uSeed + sin(uTime * .12) * .2, 0.0, uTime * .045));
             float lanes = smoothstep(0.22, 0.88, grain);
             return core * vertical * lanes;
           }

@@ -7,3 +7,7 @@ models
 npm-debug.log*
 Dockerfile
 README.md
+
+output
+docs
+.playwright-cli

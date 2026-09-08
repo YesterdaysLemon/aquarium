@@ -1,21 +1,36 @@
-import { Anchor, Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, Waves } from 'lucide-react';
+import { CreditsPage } from './CreditsPage';
+import { Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, ZoomIn, ZoomOut } from 'lucide-react';
 import { AquariumScene } from './components/AquariumScene';
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { fishSpecies, fishSpeciesById, followableFishSpecies, normalizeSpeciesIndex, type SpeciesId } from './fishSpecies';
 
 export type Quality = 'low' | 'high';
 export type CameraMode = 'overview' | 'follow';
 
 export function App() {
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [quality, setQuality] = useState<Quality>(() => window.matchMedia('(max-width: 680px)').matches ? 'low' : 'high');
   const [cameraMode, setCameraMode] = useState<CameraMode>('follow');
   const [cameraResetKey, setCameraResetKey] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const changeZoom = useCallback((factor: number) => setZoom(value => Math.min(3, Math.max(.55, value * factor))), []);
   const [followFishIndex, setFollowFishIndex] = useState(0);
   const [selectedSpecies, setSelectedSpecies] = useState<SpeciesId>('blueTang');
   const [autoFollow, setAutoFollow] = useState(true);
   const [autoTourStep, setAutoTourStep] = useState(0);
   const route = useMemo(() => window.location.pathname.replace(/\/+$/, '') || '/', []);
   const selectedSpeciesInfo = fishSpeciesById[selectedSpecies];
+
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 680px)');
+    const updateQuality = () => setQuality(mobile.matches ? 'low' : 'high');
+    mobile.addEventListener('change', updateQuality);
+    return () => mobile.removeEventListener('change', updateQuality);
+  }, []);
+
+  useEffect(() => {
+    document.querySelector('.fish-choice.is-selected')?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+  }, [selectedSpecies]);
 
   useEffect(() => {
     if (cameraMode !== 'follow' || paused || !autoFollow) return undefined;
@@ -59,20 +74,27 @@ export function App() {
   return (
     <main className="app-shell">
       <AquariumScene
-        quality="high"
+        quality={quality}
         paused={paused}
         showHitboxes={false}
         cameraMode={cameraMode}
         cameraResetKey={cameraResetKey}
         followFishIndex={followFishIndex}
         selectedSpecies={selectedSpecies}
+        zoom={zoom}
+        onZoomChange={changeZoom}
       />
       <section className="hud" aria-label="Aquarium controls">
         <div className="brand">
-          <Waves aria-hidden="true" />
-          <span>Ocean Slice</span>
+          <img src="/favicon.svg?v=2" alt="" width="26" height="26" />
+          <h1>Ocean Slice</h1>
         </div>
         <div className="controls">
+          <button type="button" className="icon-button" aria-label="Zoom out" title="Zoom out (−)" disabled={zoom <= .55}
+            onClick={() => changeZoom(1 / 1.2)}><ZoomOut aria-hidden="true" /></button>
+          <output className="zoom-level" aria-label="Camera zoom">{Math.round(zoom * 100)}%</output>
+          <button type="button" className="icon-button" aria-label="Zoom in" title="Zoom in (+)" disabled={zoom >= 3}
+            onClick={() => changeZoom(1.2)}><ZoomIn aria-hidden="true" /></button>
           <button
             type="button"
             className="icon-button"
@@ -96,7 +118,7 @@ export function App() {
             className="icon-button"
             aria-label="Reset camera"
             title="Reset camera"
-            onClick={() => setCameraResetKey((value) => value + 1)}
+            onClick={() => { setZoom(1); setCameraMode('overview'); setCameraResetKey((value) => value + 1); }}
           >
             <RotateCcw aria-hidden="true" />
           </button>
@@ -150,6 +172,7 @@ export function App() {
               key={species.id}
               className={`fish-choice ${species.id === selectedSpecies ? 'is-selected' : ''}`}
               aria-label={`Follow ${species.displayName}`}
+              aria-pressed={species.id === selectedSpecies}
               title={species.displayName}
               onClick={() => selectSpecies(species.id)}
               style={{ '--species-color': species.color } as CSSProperties}
@@ -160,51 +183,7 @@ export function App() {
           ))}
         </div>
       </section>
-      <a className="credits-link" href="/credits">
-        Model credits
-      </a>
-    </main>
-  );
-}
-
-function CreditsPage() {
-  return (
-    <main className="credits-page">
-      <a className="back-link" href="/">
-        <Anchor aria-hidden="true" />
-        Aquarium
-      </a>
-      <section className="credits-panel">
-        <h1>Model Credits</h1>
-        <p>
-          This aquarium uses optimized web conversions of locally supplied model
-          files. Source archives and production web assets are kept separate.
-        </p>
-        <article>
-          <h2>Animated Cute Fish Pack</h2>
-          <p>
-            Models by Quaternius. Licensed under CC0 1.0 Universal / Public
-            Domain Dedication.
-          </p>
-          <div className="link-row">
-            <a href="https://quaternius.com/packs/cutefish.html">Source</a>
-            <a href="https://creativecommons.org/publicdomain/zero/1.0/">License</a>
-          </div>
-        </article>
-        <article>
-          <h2>Underwater Environment</h2>
-          <p>
-            Model by Conrad Justin. Licensed under Creative Commons Attribution
-            4.0 International.
-          </p>
-          <div className="link-row">
-            <a href="https://sketchfab.com/3d-models/underwater-environment-eb5f5bdc58714e098e3d3ca12c15eb32">
-              Source
-            </a>
-            <a href="https://creativecommons.org/licenses/by/4.0/">License</a>
-          </div>
-        </article>
-      </section>
+      <p className="camera-hint">Scroll or pinch to zoom{cameraMode === 'overview' ? ' · Drag to orbit' : ''}</p>
     </main>
   );
 }

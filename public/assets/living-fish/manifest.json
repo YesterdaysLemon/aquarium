@@ -1,0 +1,106 @@
+{
+  "authoring": "Original Ocean Slice surfaces, finished and exported with Blender",
+  "source": "docs/living-fish-studio.blend",
+  "fish": [
+    {
+      "id": "chromis",
+      "displayName": "Green Chromis",
+      "icon": "/assets/living-fish/chromis.png",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true,
+      "color": "#71dace",
+      "model": "/assets/living-fish/chromis.glb"
+    },
+    {
+      "id": "anthias",
+      "displayName": "Anthias",
+      "icon": "/assets/living-fish/anthias.png",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true,
+      "color": "#f887ad",
+      "model": "/assets/living-fish/anthias.glb"
+    },
+    {
+      "id": "bannerfish",
+      "displayName": "Bannerfish",
+      "icon": "/assets/living-fish/bannerfish.png",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true,
+      "color": "#f5de89",
+      "model": "/assets/living-fish/bannerfish.glb"
+    },
+    {
+      "id": "clownfish",
+      "displayName": "Clownfish",
+      "icon": "/assets/living-fish/clownfish.png",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true,
+      "color": "#ff7b25",
+      "model": "/assets/living-fish/clownfish.glb"
+    },
+    {
+      "id": "blueTang",
+      "displayName": "Blue Tang",
+      "icon": "/assets/living-fish/blueTang.png",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true,
+      "color": "#2366ff",
+      "model": "/assets/living-fish/blueTang.glb"
+    },
+    {
+      "id": "yellowTang",
+      "displayName": "Yellow Tang",
+      "icon": "/assets/living-fish/yellowTang.png",
+      "schooling": true,
+      "predator": false,
+      "followEligible": true,
+      "color": "#ffd22d",
+      "model": "/assets/living-fish/yellowTang.glb"
+    },
+    {
+      "id": "goldfish",
+      "displayName": "Goldfish",
+      "icon": "/assets/living-fish/goldfish.png",
+      "schooling": false,
+      "predator": false,
+      "followEligible": true,
+      "color": "#f2942e",
+      "model": "/assets/living-fish/goldfish.glb"
+    },
+    {
+      "id": "koi",
+      "displayName": "Koi",
+      "icon": "/assets/living-fish/koi.png",
+      "schooling": false,
+      "predator": false,
+      "followEligible": true,
+      "color": "#f2efe0",
+      "model": "/assets/living-fish/koi.glb"
+    },
+    {
+      "id": "puffer",
+      "displayName": "Puffer",
+      "icon": "/assets/living-fish/puffer.png",
+      "schooling": false,
+      "predator": false,
+      "followEligible": true,
+      "color": "#d1bc67",
+      "model": "/assets/living-fish/puffer.glb"
+    },
+    {
+      "id": "shark",
+      "displayName": "Shark",
+      "icon": "/assets/living-fish/shark.png",
+      "schooling": false,
+      "predator": true,
+      "followEligible": true,
+      "color": "#607680",
+      "model": "/assets/living-fish/shark.glb"
+    }
+  ]
+}

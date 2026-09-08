@@ -1,6 +1,7 @@
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
+import { oceanTime } from '../underwaterShading';
 
 export function WaterEffects({ paused }: { paused: boolean }) {
   return (
@@ -18,9 +19,11 @@ function CausticField({ paused }: { paused: boolean }) {
   });
 
   useFrame((_, delta) => {
-    if (paused) return;
-    material.uniforms.uTime.value += delta;
+    if (paused || document.hidden) return;
+    oceanTime.value += Math.min(delta, .1);
+    material.uniforms.uTime.value = oceanTime.value;
   });
+  useEffect(() => () => material.dispose(), [material]);
 
   return (
     <mesh position={[0, -7.15, 0]} rotation={[Math.PI / 2, 0, 0]} material={material} renderOrder={1}>
@@ -74,7 +77,7 @@ function useAnimatedWaterMaterial({
             vec2 p = (vUv - 0.5) * 2.0;
             float radial = length(p);
             float edgeFade = 1.0 - smoothstep(0.36, 0.92, radial);
-            vec2 worldish = vLocalPosition.xz * 0.16;
+            vec2 worldish = vLocalPosition.xy * 0.16;
             float caustic =
               linePattern(worldish, 0.36, 0.35) *
               linePattern(worldish * 1.13 + 3.2, -0.22, -0.72);

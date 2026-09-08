@@ -85,26 +85,19 @@ export function getBoxAvoidance(
   clearance: number,
   target = new THREE.Vector3(),
 ) {
-  const half = collider.size.clone().multiplyScalar(0.5).addScalar(clearance);
-  const min = collider.center.clone().sub(half);
-  const max = collider.center.clone().add(half);
-  const closest = target.set(
-    THREE.MathUtils.clamp(position.x, min.x, max.x),
-    THREE.MathUtils.clamp(position.y, min.y, max.y),
-    THREE.MathUtils.clamp(position.z, min.z, max.z),
-  );
-  const normal = position.clone().sub(closest);
+  const hx = collider.size.x * .5, hy = collider.size.y * .5, hz = collider.size.z * .5;
+  const px = position.x - collider.center.x, py = position.y - collider.center.y, pz = position.z - collider.center.z;
+  const normal = target.set(px - THREE.MathUtils.clamp(px, -hx, hx), py - THREE.MathUtils.clamp(py, -hy, hy), pz - THREE.MathUtils.clamp(pz, -hz, hz));
   const distance = normal.length();
 
   if (distance >= clearance) return null;
 
   if (distance < 0.001) {
-    const dx = Math.min(Math.abs(position.x - min.x), Math.abs(max.x - position.x));
-    const dy = Math.min(Math.abs(position.y - min.y), Math.abs(max.y - position.y));
-    const dz = Math.min(Math.abs(position.z - min.z), Math.abs(max.z - position.z));
+    const dx = hx - Math.abs(px), dy = hy - Math.abs(py), dz = hz - Math.abs(pz);
     if (dx <= dy && dx <= dz) normal.set(position.x < collider.center.x ? -1 : 1, 0, 0);
     else if (dy <= dz) normal.set(0, position.y < collider.center.y ? -1 : 1, 0);
     else normal.set(0, 0, position.z < collider.center.z ? -1 : 1);
+    return { normal, penetration: Math.min(dx, dy, dz) + clearance };
   } else {
     normal.divideScalar(distance);
   }
@@ -119,8 +112,9 @@ export function getColliderAvoidance(
   position: THREE.Vector3,
   collider: EnvironmentCollider,
   clearance: number,
+  target = new THREE.Vector3(),
 ) {
   return collider.kind === 'sphere'
-    ? getSphereAvoidance(position, collider, clearance)
-    : getBoxAvoidance(position, collider, clearance);
+    ? getSphereAvoidance(position, collider, clearance, target)
+    : getBoxAvoidance(position, collider, clearance, target);
 }

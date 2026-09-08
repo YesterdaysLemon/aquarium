@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prerender-credits.mjs",
+    "test": "node scripts/check-living-fish.mjs",
+    "fish-sources": "node scripts/export-fish-sources.mjs",
+    "brand-assets": "node scripts/build-brand-assets.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "prepare-assets": "node scripts/prepare-assets.mjs"
   },

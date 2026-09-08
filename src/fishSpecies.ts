@@ -5,12 +5,14 @@ export type SpeciesId =
   | 'goldfish'
   | 'koi'
   | 'puffer'
-  | 'shark';
+  | 'shark'
+  | 'chromis'
+  | 'anthias'
+  | 'bannerfish';
 
 export type FishSpecies = {
   id: SpeciesId;
   displayName: string;
-  model: string;
   icon: string;
   schooling: boolean;
   predator: boolean;
@@ -19,11 +21,13 @@ export type FishSpecies = {
 };
 
 export const fishSpecies = [
+  { id: 'chromis', displayName: 'Green Chromis', icon: '/assets/living-fish/chromis.png', schooling: true, predator: false, followEligible: true, color: '#71dace' },
+  { id: 'anthias', displayName: 'Anthias', icon: '/assets/living-fish/anthias.png', schooling: true, predator: false, followEligible: true, color: '#f887ad' },
+  { id: 'bannerfish', displayName: 'Bannerfish', icon: '/assets/living-fish/bannerfish.png', schooling: true, predator: false, followEligible: true, color: '#f5de89' },
   {
     id: 'clownfish',
     displayName: 'Clownfish',
-    model: '/assets/fish/Clownfish.glb',
-    icon: '/assets/fish-icons/clownfish.svg',
+    icon: '/assets/living-fish/clownfish.png',
     schooling: true,
     predator: false,
     followEligible: true,
@@ -32,8 +36,7 @@ export const fishSpecies = [
   {
     id: 'blueTang',
     displayName: 'Blue Tang',
-    model: '/assets/fish/BlueTang.glb',
-    icon: '/assets/fish-icons/blue-tang.svg',
+    icon: '/assets/living-fish/blueTang.png',
     schooling: true,
     predator: false,
     followEligible: true,
@@ -42,8 +45,7 @@ export const fishSpecies = [
   {
     id: 'yellowTang',
     displayName: 'Yellow Tang',
-    model: '/assets/fish/YellowTang.glb',
-    icon: '/assets/fish-icons/yellow-tang.svg',
+    icon: '/assets/living-fish/yellowTang.png',
     schooling: true,
     predator: false,
     followEligible: true,
@@ -52,8 +54,7 @@ export const fishSpecies = [
   {
     id: 'goldfish',
     displayName: 'Goldfish',
-    model: '/assets/fish/Goldfish.glb',
-    icon: '/assets/fish-icons/goldfish.svg',
+    icon: '/assets/living-fish/goldfish.png',
     schooling: false,
     predator: false,
     followEligible: true,
@@ -62,8 +63,7 @@ export const fishSpecies = [
   {
     id: 'koi',
     displayName: 'Koi',
-    model: '/assets/fish/Koi.glb',
-    icon: '/assets/fish-icons/koi.svg',
+    icon: '/assets/living-fish/koi.png',
     schooling: false,
     predator: false,
     followEligible: true,
@@ -72,8 +72,7 @@ export const fishSpecies = [
   {
     id: 'puffer',
     displayName: 'Puffer',
-    model: '/assets/fish/Puffer.glb',
-    icon: '/assets/fish-icons/puffer.svg',
+    icon: '/assets/living-fish/puffer.png',
     schooling: false,
     predator: false,
     followEligible: true,
@@ -82,8 +81,7 @@ export const fishSpecies = [
   {
     id: 'shark',
     displayName: 'Shark',
-    model: '/assets/fish/Shark.glb',
-    icon: '/assets/fish-icons/shark.svg',
+    icon: '/assets/living-fish/shark.png',
     schooling: false,
     predator: true,
     followEligible: true,
