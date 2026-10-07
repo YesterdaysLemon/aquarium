@@ -18,6 +18,10 @@ finally { await unlink(modulePath); }
 let html = await readFile('dist/index.html', 'utf8');
 const title = 'About &amp; Credits — Ocean Slice by Alireza Afshan';
 html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
+  .replace(/(<meta name="twitter:card" content=")[^"]+/, '$1summary_large_image')
+  .replace(/\s*<meta name="twitter:player(?::(?:width|height))?"[^>]*>/g, '')
+  .replace(/(<meta name="twitter:image" content=")[^"]+/, '$1https://fish.alirezaafshan.com/social-preview.png')
+  .replace(/(<meta name="twitter:image:alt" content=")[^"]+/, '$1Ocean Slice, a quiet living aquarium by Alireza Afshan')
   .replace(/(<link rel="canonical" href=")[^"]+/, '$1https://fish.alirezaafshan.com/credits')
   .replace(/(<meta property="og:url" content=")[^"]+/, '$1https://fish.alirezaafshan.com/credits')
   .replace(/(<meta (?:property="og:title"|name="twitter:title") content=")[^"]+"/g, `$1${title}"`)

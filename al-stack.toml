@@ -1,0 +1,33 @@
+# Managed by al-stack. Keep extended prose in AGENTS.md.
+"schema" = 1
+
+["project"]
+"id" = "b539df4c-52d4-40b4-9489-dfefe10f2d37"
+"name" = "aquarium"
+"status" = "experimental"
+"profile" = "web"
+"purpose" = "A living Three.js aquarium with a compact X Player Card view."
+
+["stack"]
+"version" = "0.1.0"
+"revision" = "11eac15f6a8a0dc76f06ef97c7c3a27c7f668e0a+dirty.14419bcd734fed27"
+
+["commands"]
+"dev" = "npm run dev -- --host 127.0.0.1"
+"build" = "npm run build"
+"test" = "npm test"
+
+[["tools"]]
+"name" = "node"
+"kind" = "cli"
+"command" = "node"
+
+[["tools"]]
+"name" = "npm"
+"kind" = "cli"
+"command" = "npm"
+
+[["tools"]]
+"name" = "docker"
+"kind" = "cli"
+"command" = "docker"

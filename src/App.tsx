@@ -1,6 +1,7 @@
 import { CreditsPage } from './CreditsPage';
 import { Camera, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Shuffle, ZoomIn, ZoomOut } from 'lucide-react';
 import { AquariumScene } from './components/AquariumScene';
+import { EmbedControls } from './components/EmbedControls';
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { fishSpecies, fishSpeciesById, followableFishSpecies, normalizeSpeciesIndex, type SpeciesId } from './fishSpecies';
 
@@ -8,8 +9,10 @@ export type Quality = 'low' | 'high';
 export type CameraMode = 'overview' | 'follow';
 
 export function App() {
+  const embedded = /^\/embed(?:\/index\.html)?\/?$/.test(window.location.pathname);
+  const [pageActive, setPageActive] = useState(() => !document.hidden);
   const [paused, setPaused] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const [quality, setQuality] = useState<Quality>(() => window.matchMedia('(max-width: 680px)').matches ? 'low' : 'high');
+  const [quality, setQuality] = useState<Quality>(() => embedded || window.matchMedia('(max-width: 680px)').matches ? 'low' : 'high');
   const [cameraMode, setCameraMode] = useState<CameraMode>('follow');
   const [cameraResetKey, setCameraResetKey] = useState(0);
   const [zoom, setZoom] = useState(1);
@@ -22,25 +25,43 @@ export function App() {
   const selectedSpeciesInfo = fishSpeciesById[selectedSpecies];
 
   useEffect(() => {
+    if (embedded) return;
     const mobile = window.matchMedia('(max-width: 680px)');
     const updateQuality = () => setQuality(mobile.matches ? 'low' : 'high');
     mobile.addEventListener('change', updateQuality);
     return () => mobile.removeEventListener('change', updateQuality);
-  }, []);
+  }, [embedded]);
+
+  useEffect(() => {
+    if (!embedded) return;
+    let intersects = true;
+    const update = () => setPageActive(!document.hidden && intersects);
+    const observer = new IntersectionObserver(([entry]) => {
+      intersects = entry.isIntersecting;
+      update();
+    });
+    observer.observe(document.documentElement);
+    document.addEventListener('visibilitychange', update);
+    update();
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', update);
+    };
+  }, [embedded]);
 
   useEffect(() => {
     document.querySelector('.fish-choice.is-selected')?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
   }, [selectedSpecies]);
 
   useEffect(() => {
-    if (cameraMode !== 'follow' || paused || !autoFollow) return undefined;
+    if (cameraMode !== 'follow' || paused || !autoFollow || (embedded && !pageActive)) return undefined;
 
     const timer = window.setInterval(() => {
       setAutoTourStep((value) => value + 1);
     }, 10000);
 
     return () => window.clearInterval(timer);
-  }, [autoFollow, cameraMode, paused]);
+  }, [autoFollow, cameraMode, paused, embedded, pageActive]);
 
   useEffect(() => {
     if (cameraMode !== 'follow' || !autoFollow || autoTourStep === 0) return;
@@ -72,10 +93,11 @@ export function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main className={`app-shell${embedded ? ' app-shell--embed' : ''}`}>
       <AquariumScene
         quality={quality}
-        paused={paused}
+        paused={paused || (embedded && !pageActive)}
+        active={!embedded || pageActive}
         showHitboxes={false}
         cameraMode={cameraMode}
         cameraResetKey={cameraResetKey}
@@ -84,6 +106,21 @@ export function App() {
         zoom={zoom}
         onZoomChange={changeZoom}
       />
+      {embedded ? (
+        <EmbedControls
+          paused={paused}
+          cameraMode={cameraMode}
+          selectedSpecies={selectedSpecies}
+          autoFollow={autoFollow}
+          onPause={() => setPaused(value => !value)}
+          onCamera={toggleFollowMode}
+          onSpecies={selectSpecies}
+          onTour={() => {
+            setCameraMode('follow');
+            setAutoFollow(value => cameraMode !== 'follow' || !value);
+          }}
+        />
+      ) : <>
       <section className="hud" aria-label="Aquarium controls">
         <div className="brand">
           <img src="/favicon.svg?v=2" alt="" width="26" height="26" />
@@ -184,6 +221,7 @@ export function App() {
         </div>
       </section>
       <p className="camera-hint">Scroll or pinch to zoom{cameraMode === 'overview' ? ' · Drag to orbit' : ''}</p>
+      </>}
     </main>
   );
 }

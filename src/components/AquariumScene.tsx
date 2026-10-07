@@ -16,6 +16,7 @@ import { swayKelp, underwaterMaterial } from '../underwaterShading';
 type Props = {
   quality: Quality;
   paused: boolean;
+  active?: boolean;
   showHitboxes: boolean;
   cameraMode: CameraMode;
   cameraResetKey: number;
@@ -31,6 +32,7 @@ const hiddenEnvironmentMeshes = new Set(['Object1040']);
 export function AquariumScene({
   quality,
   paused,
+  active = true,
   showHitboxes,
   cameraMode,
   cameraResetKey,
@@ -47,6 +49,8 @@ export function AquariumScene({
   return (
     <Canvas
       className="aquarium-canvas"
+      frameloop={active ? 'always' : 'never'}
+      fallback={<p className="loading-intro">This aquarium needs WebGL. <a href="/" target="_blank" rel="noopener noreferrer">Open the full aquarium</a> in a browser that supports it.</p>}
       dpr={quality === 'high' ? [1, 1.5] : [0.75, 1]}
       gl={{ antialias: quality === 'high', powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.12 }}
       shadows={quality === 'high'}
